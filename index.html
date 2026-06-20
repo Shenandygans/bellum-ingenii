@@ -611,8 +611,8 @@ body.hp .res-callout{background:rgba(192,160,56,0.1);color:#e0cda0;border:1.5px 
         <div style="font-size:13px;color:var(--text3);text-align:center;margin-bottom:22px">Start with ✦ 500 welcome reputation</div>
         <label class="lbl">Display name</label><input class="inp" id="su-n" placeholder="How others see you">
         <label class="lbl">Username</label><input class="inp" id="su-u" placeholder="lowercase, no spaces">
-        <label class="lbl">Email</label><input class="inp" type="email" placeholder="you@example.com">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><label class="lbl">Password</label><input class="inp" type="password" placeholder="••••••••"></div><div><label class="lbl">Confirm</label><input class="inp" type="password" placeholder="••••••••"></div></div>
+        <label class="lbl">Email</label><input class="inp" type="email" id="su-email" placeholder="you@example.com">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><label class="lbl">Password</label><input class="inp" type="password" id="su-p" placeholder="••••••••"></div><div><label class="lbl">Confirm</label><input class="inp" type="password" id="su-p2" placeholder="••••••••"></div></div>
         <label class="lbl">Favorite subject</label>
         <select class="inp"><option value="">— optional —</option><option>Algebra</option><option>Geometry</option><option>Number Theory</option><option>Calculus</option><option>Analysis</option></select>
         <button class="btn" style="width:100%;justify-content:center;padding:12px;margin-top:4px" onclick="doSignup()">Create account</button>
@@ -632,7 +632,7 @@ body.hp .res-callout{background:rgba(192,160,56,0.1);color:#e0cda0;border:1.5px 
     </span>
     <div class="rep-pill" id="cpill">
       <svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-diamond"/></svg>
-      <span id="cdisp">1,240</span>
+      <span id="cdisp">500</span>
     </div>
     <div id="g-ind" style="display:none;font-size:12px;font-weight:600;color:var(--ora-t);background:var(--ora-bg);border:1.5px solid var(--ora-bd);border-radius:20px;padding:3px 11px">Guest</div>
     <div class="ml-auto hdr-row">
@@ -641,7 +641,7 @@ body.hp .res-callout{background:rgba(192,160,56,0.1);color:#e0cda0;border:1.5px 
         <button class="t-btn" onclick="setTheme('hp',this)">HP</button>
         <button class="t-btn" onclick="setTheme('owl',this)">Owl</button>
       </div>
-      <button class="btng" style="font-size:12px;padding:6px 10px" onclick="showPage('settings')">
+      <button class="btng" style="font-size:12px;padding:6px 10px" onclick="openSettings()">
         <svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-gear"/></svg>
       </button>
       <button class="btn2" style="font-size:12px;padding:6px 14px" onclick="doLogout()">
@@ -716,17 +716,13 @@ body.hp .res-callout{background:rgba(192,160,56,0.1);color:#e0cda0;border:1.5px 
                   <div class="ddi-ic"><svg class="ic" style="stroke:currentColor"><use href="#ic-swords"/></svg></div>
                   <div><div class="ddi-lbl">Challenge a player</div><div class="ddi-desc">Send a 1v1 duel request</div></div>
                 </div>
-                <div class="ddi" onclick="closeDD();openActiveDuel()">
-                  <div class="ddi-ic"><svg class="ic" style="stroke:currentColor"><use href="#ic-target"/></svg></div>
-                  <div><div class="ddi-lbl">Active duel: Gauss_Jr</div><div class="ddi-desc">Your turn · 6h remaining</div></div>
-                </div>
-                <div class="ddi" onclick="closeDD();alert('W:7  L:2  Streak:3')">
+                <div class="ddi" onclick="closeDD();alert('W: 0 · L: 0 · Streak: 0\\n\\nYou have not completed any duels yet.')">
                   <div class="ddi-ic"><svg class="ic" style="stroke:currentColor"><use href="#ic-history"/></svg></div>
-                  <div><div class="ddi-lbl">Duel history</div><div class="ddi-desc">W: 7 · L: 2 · Streak: 3</div></div>
+                  <div><div class="ddi-lbl">Duel history</div><div class="ddi-desc">W: 0 · L: 0 · Streak: 0</div></div>
                 </div>
-                <div class="ddi" onclick="closeDD();alert('2 pending duel invites')">
+                <div class="ddi" onclick="closeDD();alert('No incoming challenges right now.')">
                   <div class="ddi-ic"><svg class="ic" style="stroke:currentColor"><use href="#ic-mail"/></svg></div>
-                  <div><div class="ddi-lbl">Pending invites</div><div class="ddi-desc">2 incoming challenges</div></div>
+                  <div><div class="ddi-lbl">Pending invites</div><div class="ddi-desc">No incoming challenges</div></div>
                 </div>
                 <div class="ddi" onclick="closeDD();showPage('resources')">
                   <div class="ddi-ic"><svg class="ic" style="stroke:currentColor"><use href="#ic-arsenal"/></svg></div>
@@ -735,75 +731,10 @@ body.hp .res-callout{background:rgba(192,160,56,0.1);color:#e0cda0;border:1.5px 
               </div>
             </div>
           </div>
-          <div class="card card-click anim-in" onclick="openActiveDuel()" style="border-color:var(--blu-bd)">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-              <div class="badge blu">
-                <svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-swords"/></svg> In progress — your turn
-              </div>
-              <div class="timer">
-                <svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-timer"/></svg> 6h left
-              </div>
-            </div>
-            <div class="duel-grid" style="margin-bottom:12px">
-              <div class="player-card">
-                <div class="player-av"><svg class="ic" style="stroke:currentColor"><use href="#ic-user"/></svg></div>
-                <div style="font-size:13px;font-weight:600;color:var(--text)">you</div>
-                <div style="font-size:11px;color:var(--text3)">✦ 1,240</div>
-              </div>
-              <div style="font-size:22px;font-weight:700;color:var(--text3);text-align:center">VS</div>
-              <div class="player-card">
-                <div class="player-av"><svg class="ic" style="stroke:currentColor"><use href="#ic-user"/></svg></div>
-                <div style="font-size:13px;font-weight:600;color:var(--text)">Gauss_Jr</div>
-                <div style="font-size:11px;color:var(--text3)">✦ 980</div>
-              </div>
-            </div>
-            <div style="text-align:center;font-size:13px;color:var(--text2)">Stakes: <strong style="color:var(--text)">✦ 124 reputation</strong></div>
-          </div>
-          <div class="card anim-in" style="animation-delay:.07s">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
-              <div class="badge grn">
-                <svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-check"/></svg> Victory
-              </div>
-              <span class="meta">2 days ago</span>
-            </div>
-            <div style="font-size:14px;color:var(--text2)">vs <strong>EulerFan</strong> — <span style="color:var(--grn-t);font-weight:600">+✦ 87 reputation</span></div>
-          </div>
+          <div id="duels-list"></div>
         </div>
       </div>
       <div id="arena-ch" style="display:none"><div id="ch-inner"></div></div>
-      <div id="arena-duel" style="display:none">
-        <button class="back-btn" onclick="backArena()">
-          <svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-chevron-left"/></svg> Back
-        </button>
-        <div class="card" style="background:var(--bg2)">
-          <div class="duel-grid" style="margin-bottom:12px">
-            <div class="player-card">
-              <div class="player-av"><svg class="ic" style="stroke:currentColor"><use href="#ic-user"/></svg></div>
-              <div style="font-size:13px;font-weight:600;color:var(--text)">you</div>
-              <div style="font-size:11px;color:var(--text3)">✦ 1,240</div>
-            </div>
-            <div style="font-size:22px;font-weight:700;color:var(--text3);text-align:center">
-              <svg class="ic ic-lg" style="stroke:currentColor"><use href="#ic-swords"/></svg>
-            </div>
-            <div class="player-card">
-              <div class="player-av"><svg class="ic" style="stroke:currentColor"><use href="#ic-user"/></svg></div>
-              <div style="font-size:13px;font-weight:600;color:var(--text)">Gauss_Jr</div>
-              <div style="font-size:11px;color:var(--text3)">✦ 980</div>
-            </div>
-          </div>
-          <div style="text-align:center;font-size:13px;color:var(--text2)">Stakes: <strong>✦ 124 reputation</strong></div>
-        </div>
-        <div class="sec-t" style="font-size:15px;margin:16px 0 10px">Your 5-problem loadout</div>
-        <div class="card">
-          <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">From problem sets (3 of 3)</div>
-          <div class="slot"><div class="slot-n">1</div><div style="flex:1;font-size:13px;color:var(--text)">Combinatorics: Stars and Bars #14</div><div class="badge grn" style="font-size:11px">Solved</div></div>
-          <div class="slot"><div class="slot-n">2</div><div style="flex:1;font-size:13px;color:var(--text)">Modular Arithmetic: Fermat's Little Theorem #9</div><div class="badge grn" style="font-size:11px">Solved</div></div>
-          <div class="slot"><div class="slot-n">3</div><div style="flex:1;font-size:13px;color:var(--text)">Quadratics: Sum of roots #7</div><div class="badge grn" style="font-size:11px">Solved</div></div>
-          <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin:12px 0 8px">Forum + Original</div>
-          <div class="slot"><div class="slot-n">4</div><div style="flex:1;font-size:13px;color:var(--text)">√2+√3 irrational — your accepted solution</div><div class="badge grn" style="font-size:11px">Used</div></div>
-          <div class="slot"><div class="slot-n">5</div><div style="flex:1;font-size:13px;color:var(--text)">"For which n does n! end in exactly 100 zeros?"</div><div class="badge ora" style="font-size:11px">⏳ Pending</div></div>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -812,38 +743,13 @@ body.hp .res-callout{background:rgba(192,160,56,0.1);color:#e0cda0;border:1.5px 
     <div class="container">
       <div class="sec-hdr">
         <div><div class="sec-t">Resource Library</div><div class="sec-sub">Uploaded PDFs · collectable problem sets from Pre-Algebra to Real Analysis</div></div>
-        <button class="btn admin-only-btn" onclick="alert('Upload PDF')" style="display:none">
+        <button class="btn admin-only-btn" onclick="openUploadPdfModal()" style="display:none">
           <svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-upload"/></svg> Upload PDF
         </button>
       </div>
       <div style="margin-bottom:22px">
         <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px">Uploaded collections <span style="font-weight:400;color:var(--text3);font-size:12px">— admin-managed</span></div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:12px">
-          <div class="card card-click anim-in" style="padding:14px" onclick="alert('Opens PDF viewer')">
-            <div style="margin-bottom:10px;color:var(--text2)"><svg class="ic ic-lg" style="stroke:currentColor"><use href="#ic-doc"/></svg></div>
-            <div style="font-size:13px;font-weight:600;color:var(--text)">MATHCOUNTS 2023 State Sprint</div>
-            <div style="font-size:11px;color:var(--text3);margin-top:4px">PDF · Uploaded by admin</div>
-            <div class="admin-only-btn" style="display:none;margin-top:8px">
-              <button class="btng" style="font-size:11px;padding:3px 8px;color:var(--red-t);border-color:var(--red-bd);width:100%;justify-content:center" onclick="event.stopPropagation();alert('Delete PDF?')">Remove</button>
-            </div>
-          </div>
-          <div class="card card-click anim-in" style="padding:14px;animation-delay:.05s" onclick="alert('Opens PDF viewer')">
-            <div style="margin-bottom:10px;color:var(--text2)"><svg class="ic ic-lg" style="stroke:currentColor"><use href="#ic-doc"/></svg></div>
-            <div style="font-size:13px;font-weight:600;color:var(--text)">MATHCOUNTS 2022 Chapter Target</div>
-            <div style="font-size:11px;color:var(--text3);margin-top:4px">PDF · Uploaded by admin</div>
-            <div class="admin-only-btn" style="display:none;margin-top:8px">
-              <button class="btng" style="font-size:11px;padding:3px 8px;color:var(--red-t);border-color:var(--red-bd);width:100%;justify-content:center" onclick="event.stopPropagation();alert('Delete PDF?')">Remove</button>
-            </div>
-          </div>
-          <div class="card card-click anim-in" style="padding:14px;animation-delay:.1s" onclick="alert('Opens PDF viewer')">
-            <div style="margin-bottom:10px;color:var(--text2)"><svg class="ic ic-lg" style="stroke:currentColor"><use href="#ic-doc"/></svg></div>
-            <div style="font-size:13px;font-weight:600;color:var(--text)">AMC 8 2021 Full Set</div>
-            <div style="font-size:11px;color:var(--text3);margin-top:4px">PDF · Uploaded by admin</div>
-            <div class="admin-only-btn" style="display:none;margin-top:8px">
-              <button class="btng" style="font-size:11px;padding:3px 8px;color:var(--red-t);border-color:var(--red-bd);width:100%;justify-content:center" onclick="event.stopPropagation();alert('Delete PDF?')">Remove</button>
-            </div>
-          </div>
-        </div>
+        <div id="pdf-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:12px"></div>
         <div id="res-readonly-note" style="font-size:12px;color:var(--text3);margin-top:10px;display:flex;align-items:center;gap:6px">
           <svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-doc"/></svg>
           Only admins can upload or remove PDF resources. Everyone can view and download.
@@ -882,9 +788,9 @@ body.hp .res-callout{background:rgba(192,160,56,0.1);color:#e0cda0;border:1.5px 
         </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px;padding:26px;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--rl);margin-bottom:32px">
-        <div style="text-align:center"><div style="font-family:var(--font-d);font-size:34px;font-weight:800;color:var(--accent)">127</div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-top:4px;font-weight:600">Problems</div></div>
-        <div style="text-align:center"><div style="font-family:var(--font-d);font-size:34px;font-weight:800;color:var(--accent)">43</div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-top:4px;font-weight:600">Active duels</div></div>
-        <div style="text-align:center"><div style="font-family:var(--font-d);font-size:34px;font-weight:800;color:var(--accent)">8</div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-top:4px;font-weight:600">Subjects</div></div>
+        <div style="text-align:center"><div id="about-st1" style="font-family:var(--font-d);font-size:34px;font-weight:800;color:var(--accent)">0</div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-top:4px;font-weight:600">Problems</div></div>
+        <div style="text-align:center"><div id="about-st2" style="font-family:var(--font-d);font-size:34px;font-weight:800;color:var(--accent)">0</div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-top:4px;font-weight:600">Active duels</div></div>
+        <div style="text-align:center"><div id="about-st3" style="font-family:var(--font-d);font-size:34px;font-weight:800;color:var(--accent)">0</div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-top:4px;font-weight:600">Subjects</div></div>
         <div style="text-align:center"><div style="font-family:var(--font-d);font-size:34px;font-weight:800;color:var(--accent)">∞</div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-top:4px;font-weight:600">Potential</div></div>
       </div>
       <div class="blockquote">"The mathematician does not study pure mathematics because it is useful; he studies it because he delights in it and he delights in it because it is beautiful." — Poincaré</div>
@@ -911,10 +817,10 @@ body.hp .res-callout{background:rgba(192,160,56,0.1);color:#e0cda0;border:1.5px 
           <button class="snav-btn" onclick="showSett('stats',this)">My stats</button>
         </div>
         <div style="flex:1;min-width:0">
-          <div id="sett-profile" class="card"><div style="font-size:14px;font-weight:600;margin-bottom:14px;color:var(--text)">Profile</div><label class="lbl">Display name</label><input class="inp" value="MathWizard_99"><label class="lbl">Username</label><input class="inp" value="mathwiz99"><label class="lbl">Bio</label><textarea class="inp" style="min-height:55px">Competitive math enjoyer. MATHCOUNTS alumni.</textarea><label class="lbl">Email</label><input class="inp" type="email" value="wizard@example.com"><button class="btn" style="margin-top:4px">Save changes</button></div>
+          <div id="sett-profile" class="card"><div style="font-size:14px;font-weight:600;margin-bottom:14px;color:var(--text)">Profile</div><label class="lbl">Display name</label><input class="inp" id="set-name" placeholder="Your display name"><label class="lbl">Username</label><input class="inp" id="set-username" placeholder="username"><label class="lbl">Bio</label><textarea class="inp" id="set-bio" placeholder="Tell other duelists about yourself..." style="min-height:55px"></textarea><label class="lbl">Email</label><input class="inp" type="email" id="set-email" placeholder="you@example.com"><button class="btn" style="margin-top:4px" onclick="saveProfile()">Save changes</button></div>
           <div id="sett-password" class="card" style="display:none"><div style="font-size:14px;font-weight:600;margin-bottom:14px;color:var(--text)">Change password</div><label class="lbl">Current</label><input class="inp" type="password" placeholder="••••••••"><label class="lbl">New</label><input class="inp" type="password" placeholder="••••••••"><label class="lbl">Confirm</label><input class="inp" type="password" placeholder="••••••••"><button class="btn">Update</button></div>
           <div id="sett-display" class="card" style="display:none"><div style="font-size:14px;font-weight:600;margin-bottom:14px;color:var(--text)">Display preferences</div><label class="lbl">Default theme</label><select class="inp"><option>Default</option><option>Harry Potter</option><option>Owl Post</option></select><label class="lbl">Default tab</label><select class="inp"><option>Arena</option><option>Resources</option></select><button class="btn">Save</button></div>
-          <div id="sett-stats" class="card" style="display:none"><div style="font-size:14px;font-weight:600;margin-bottom:14px;color:var(--text)">My stats</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div style="background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);padding:14px;text-align:center"><div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Reputation</div><div style="font-family:var(--font-d);font-size:28px;font-weight:700;color:var(--text)">1,240</div></div><div style="background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);padding:14px;text-align:center"><div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Duels won</div><div style="font-family:var(--font-d);font-size:28px;font-weight:700;color:var(--text)">7</div></div><div style="background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);padding:14px;text-align:center"><div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Solved</div><div style="font-family:var(--font-d);font-size:28px;font-weight:700;color:var(--text)">43</div></div><div style="background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);padding:14px;text-align:center"><div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Upvotes</div><div style="font-family:var(--font-d);font-size:28px;font-weight:700;color:var(--text)">186</div></div></div></div>
+          <div id="sett-stats" class="card" style="display:none"><div style="font-size:14px;font-weight:600;margin-bottom:14px;color:var(--text)">My stats</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div style="background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);padding:14px;text-align:center"><div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Reputation</div><div id="stat-rep" style="font-family:var(--font-d);font-size:28px;font-weight:700;color:var(--text)">500</div></div><div style="background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);padding:14px;text-align:center"><div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Duels won</div><div id="stat-duelswon" style="font-family:var(--font-d);font-size:28px;font-weight:700;color:var(--text)">0</div></div><div style="background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);padding:14px;text-align:center"><div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Solved</div><div id="stat-solved" style="font-family:var(--font-d);font-size:28px;font-weight:700;color:var(--text)">0</div></div><div style="background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);padding:14px;text-align:center"><div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;margin-bottom:4px">Upvotes</div><div id="stat-upvotes" style="font-family:var(--font-d);font-size:28px;font-weight:700;color:var(--text)">0</div></div></div></div>
         </div>
       </div>
     </div>
@@ -925,12 +831,17 @@ body.hp .res-callout{background:rgba(192,160,56,0.1);color:#e0cda0;border:1.5px 
     <div class="container">
       <button class="back-btn" onclick="showPage('arena')"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-chevron-left"/></svg> Back</button>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px"><div class="sec-t">Admin Panel</div><div class="badge red">Admin access</div></div>
+      <div style="background:var(--blu-bg);border:1.5px solid var(--blu-bd);border-radius:var(--r);padding:10px 14px;margin-bottom:16px;font-size:12.5px;color:var(--blu-t);line-height:1.6">
+        Changes here are saved to the shared database — they're visible to <strong>every visitor</strong> of the live site immediately, not just on this device.
+      </div>
       <div class="inner-tabs" style="margin-bottom:18px"><button class="itab on" onclick="switchAdmin('users',this)">Users</button><button class="itab" onclick="switchAdmin('challenges',this)">Challenges</button><button class="itab" onclick="switchAdmin('resources',this)">Resources</button><button class="itab" onclick="switchAdmin('disputes',this)">Disputes</button></div>
-      <div id="adm-users"><table class="atbl"><thead><tr><th>Username</th><th>Reputation</th><th>Duels</th><th>Status</th><th>Actions</th></tr></thead><tbody><tr><td>Arcturus_7</td><td>✦ 2,140</td><td>12</td><td><span class="badge grn">Active</span></td><td><button class="btng" style="font-size:11px;padding:3px 8px">View</button></td></tr><tr><td>Penelope_∞</td><td>✦ 3,870</td><td>21</td><td><span class="badge grn">Active</span></td><td><button class="btng" style="font-size:11px;padding:3px 8px">View</button></td></tr><tr><td>Gauss_Jr</td><td>✦ 980</td><td>8</td><td><span class="badge grn">Active</span></td><td><button class="btng" style="font-size:11px;padding:3px 8px">View</button></td></tr></tbody></table></div>
-      <div id="adm-challenges" style="display:none"><table class="atbl"><thead><tr><th>Problem</th><th>Author</th><th>Status</th><th>Solutions</th><th>Actions</th></tr></thead><tbody><tr><td>x²−y²=2023</td><td>Arcturus_7</td><td><span class="badge grn">Active</span></td><td>12</td><td><button class="btng" style="font-size:11px;padding:3px 8px;color:var(--red-t);border-color:var(--red-bd)">Remove</button></td></tr><tr><td>√2+√3 irrational</td><td>Penelope_∞</td><td><span class="badge red">Closed</span></td><td>8</td><td><button class="btng" style="font-size:11px;padding:3px 8px;color:var(--red-t);border-color:var(--red-bd)">Remove</button></td></tr></tbody></table></div>
+      <div id="adm-users"><table class="atbl"><thead><tr><th>Username</th><th>Reputation</th><th>Duels</th><th>Status</th><th>Actions</th></tr></thead><tbody id="adm-users-tbody"></tbody></table></div>
+      <div id="adm-challenges" style="display:none"><table class="atbl"><thead><tr><th>Problem</th><th>Author</th><th>Status</th><th>Solutions</th><th>Actions</th></tr></thead><tbody id="adm-challenges-tbody"></tbody></table></div>
       <div id="adm-resources" style="display:none">
-        <div style="margin-bottom:14px"><button class="btn" onclick="alert('Upload PDF')"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-upload"/></svg> Upload new PDF</button></div>
-        <table class="atbl"><thead><tr><th>File</th><th>Subject tag</th><th>Uploaded</th><th>Actions</th></tr></thead><tbody><tr><td>MATHCOUNTS 2023 State Sprint</td><td>Counting</td><td>3 weeks ago</td><td><button class="btng" style="font-size:11px;padding:3px 8px;color:var(--red-t);border-color:var(--red-bd)">Remove</button></td></tr><tr><td>MATHCOUNTS 2022 Chapter Target</td><td>Algebra</td><td>2 months ago</td><td><button class="btng" style="font-size:11px;padding:3px 8px;color:var(--red-t);border-color:var(--red-bd)">Remove</button></td></tr><tr><td>AMC 8 2021 Full Set</td><td>Mixed</td><td>4 months ago</td><td><button class="btng" style="font-size:11px;padding:3px 8px;color:var(--red-t);border-color:var(--red-bd)">Remove</button></td></tr></tbody></table>
+        <div style="margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn" onclick="openUploadPdfModal()"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-upload"/></svg> Upload new PDF</button>
+        </div>
+        <table class="atbl"><thead><tr><th>File</th><th>Subject tag</th><th>Uploaded</th><th>Actions</th></tr></thead><tbody id="adm-resources-tbody"></tbody></table>
       </div>
       <div id="adm-disputes" style="display:none"><div style="padding:30px 0;text-align:center;color:var(--text3)">No open disputes.</div></div>
     </div>
@@ -1043,32 +954,7 @@ body.hp .res-callout{background:rgba(192,160,56,0.1);color:#e0cda0;border:1.5px 
       </button>
     </div>
     <!-- Podium -->
-    <div style="display:flex;align-items:flex-end;justify-content:center;gap:8px;padding:24px 24px 0;background:var(--bg2)">
-      <div style="text-align:center;flex:1">
-        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:4px">2nd</div>
-        <div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r) var(--r) 0 0;padding:14px 8px;height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center">
-          <svg style="width:22px;height:22px;stroke:#9aa6b8;fill:none;margin-bottom:4px" viewBox="0 0 24 24" stroke-width="1.6"><use href="#ic-trophy"/></svg>
-          <div style="font-size:12px;font-weight:600;color:var(--text)">Arcturus_7</div>
-          <div style="font-size:11px;color:var(--text3)">✦ 2,140</div>
-        </div>
-      </div>
-      <div style="text-align:center;flex:1">
-        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:4px">1st</div>
-        <div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r) var(--r) 0 0;padding:14px 8px;height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center">
-          <svg style="width:28px;height:28px;stroke:#d4a017;fill:none;margin-bottom:4px" viewBox="0 0 24 24" stroke-width="1.6"><use href="#ic-crown"/></svg>
-          <div style="font-size:13px;font-weight:700;color:var(--text)">Penelope_∞</div>
-          <div style="font-size:12px;color:var(--accent);font-weight:600">✦ 3,870</div>
-        </div>
-      </div>
-      <div style="text-align:center;flex:1">
-        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:4px">3rd</div>
-        <div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r) var(--r) 0 0;padding:14px 8px;height:65px;display:flex;flex-direction:column;align-items:center;justify-content:center">
-          <svg style="width:18px;height:18px;stroke:#b8784a;fill:none;margin-bottom:4px" viewBox="0 0 24 24" stroke-width="1.6"><use href="#ic-trophy"/></svg>
-          <div style="font-size:12px;font-weight:600;color:var(--text)">you</div>
-          <div style="font-size:11px;color:var(--text3)">✦ 1,240</div>
-        </div>
-      </div>
-    </div>
+    <div id="lb-podium" style="display:flex;align-items:flex-end;justify-content:center;gap:8px;padding:24px 24px 0;background:var(--bg2)"></div>
     <!-- Full rankings -->
     <div style="max-height:300px;overflow-y:auto">
       <div id="lb-list"></div>
@@ -1093,22 +979,114 @@ body.hp .res-callout{background:rgba(192,160,56,0.1);color:#e0cda0;border:1.5px 
   </div>
 </div>
 
+<!-- UPLOAD PDF MODAL (admin only) -->
+<!-- UNLOCK SET MODAL -->
+<div id="unlock-modal" class="modal-bg">
+  <div class="modal" style="max-width:420px;text-align:center">
+    <button class="modal-x" onclick="closeModal('unlock-modal')"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-x"/></svg></button>
+    <div style="margin:6px 0 14px;color:var(--text2)"><svg style="width:40px;height:40px;stroke:currentColor;fill:none" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+    <div id="unlock-modal-name" class="modal-t" style="justify-content:center;margin-bottom:6px">Set name</div>
+    <div id="unlock-modal-meta" class="meta" style="justify-content:center;margin-bottom:18px"></div>
+    <div id="unlock-modal-cost" style="font-family:var(--font-d);font-size:30px;font-weight:700;color:var(--accent);margin-bottom:6px">✦ 0</div>
+    <div id="unlock-modal-balance" style="font-size:12.5px;color:var(--text3);margin-bottom:18px"></div>
+    <div id="unlock-modal-err" style="display:none;background:var(--red-bg);border:1.5px solid var(--red-bd);border-radius:var(--r);padding:9px 12px;font-size:13px;color:var(--red-t);margin-bottom:12px"></div>
+    <button class="btn" id="unlock-modal-btn" style="width:100%;justify-content:center;padding:11px" onclick="confirmUnlock()">Unlock this set</button>
+  </div>
+</div>
+
+<div id="upload-pdf-modal" class="modal-bg">
+  <div class="modal">
+    <button class="modal-x" onclick="closeModal('upload-pdf-modal')"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-x"/></svg></button>
+    <div class="modal-t"><svg class="ic" style="stroke:currentColor"><use href="#ic-upload"/></svg> Upload a PDF resource</div>
+    <label class="lbl">Title</label>
+    <input class="inp" id="upd-title" placeholder="e.g. AMC 10 2024 Full Set">
+    <label class="lbl">Subject tag</label>
+    <select class="inp" id="upd-subj"><option>Pre-Algebra</option><option>Algebra</option><option>Geometry</option><option>Counting</option><option>Number Theory</option><option>Calculus</option><option>Analysis</option><option>Mixed</option></select>
+    <label class="lbl">File <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(optional — embedded directly, ~8MB max)</span></label>
+    <input class="inp" type="file" id="upd-file" accept="application/pdf">
+    <label class="lbl">…or a link <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(use instead of a file for anything larger)</span></label>
+    <input class="inp" id="upd-url" placeholder="https://...">
+    <div style="background:var(--ora-bg);border:1.5px solid var(--ora-bd);border-radius:var(--r);padding:9px 12px;font-size:12px;color:var(--ora-t);margin-bottom:12px">
+      This saves to the shared database — it appears for every visitor right away.
+    </div>
+    <button class="btn" onclick="submitUploadPdf()">Add resource</button>
+  </div>
+</div>
+
+<!-- DUEL ANSWER MODAL (opponent submits answers to the 5 problems) -->
+<div id="duel-answer-modal" class="modal-bg">
+  <div class="modal" style="max-width:640px">
+    <button class="modal-x" onclick="closeModal('duel-answer-modal')"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-x"/></svg></button>
+    <div class="modal-t"><svg class="ic" style="stroke:currentColor"><use href="#ic-swords"/></svg> Answer the challenge</div>
+    <div id="duel-answer-stakes" class="meta" style="margin-bottom:14px"></div>
+    <div id="duel-answer-list"></div>
+    <button class="btn" style="margin-top:10px" onclick="submitDuelAnswers()">Submit all answers</button>
+  </div>
+</div>
+
+<!-- DUEL JUDGE MODAL (challenger grades the non-auto-gradable slots) -->
+<div id="duel-judge-modal" class="modal-bg">
+  <div class="modal" style="max-width:640px">
+    <button class="modal-x" onclick="closeModal('duel-judge-modal')"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-x"/></svg></button>
+    <div class="modal-t"><svg class="ic" style="stroke:currentColor"><use href="#ic-flag"/></svg> Judge the answers</div>
+    <div style="font-size:12.5px;color:var(--text3);margin-bottom:14px">These slots don't have a single checkable answer, so you grade them — you wrote the problem (or your own forum solution is the reference), so you know what a correct answer looks like.</div>
+    <div id="duel-judge-list"></div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 <script>
-const AU='Shenandygans2011',AP='iloveHP22';
-let isGuest=false,isAdmin=false,theme='';
-let mapAF=null,mapCtx=null,walkers=[];
-let bgOwlT=null,owlCvs=null,owlCtx=null,owlAF=null;
-const owls=[];
-let hwInt=null,hwD='',hwQ='';
-let ocFilt='all',resFilt='all';
-let currentOpenChallengeId=null;
-let userRep=1240;
+// ============================================================================
+// CONFIG — point this at your deployed backend (see backend README for setup)
+// ============================================================================
+const API_BASE = 'https://YOUR-BACKEND.onrender.com/api'; // <-- EDIT THIS after deploying the backend
+
+const BOT_DISPLAY = { eulerbot:'EulerBot', gaussbot:'GaussBot', noetherbot:'NoetherBot', ramanujanbot:'RamanujanBot', turingbot:'TuringBot' };
+function dispName(u){ return BOT_DISPLAY[u] || u; }
+function isBotUsername(u){ return !!BOT_DISPLAY[u]; }
+
+// ============================================================================
+// STATE
+// ============================================================================
+let authToken = null;
+try { authToken = localStorage.getItem('bi_token'); } catch(e) { authToken = null; }
+let currentUser = null;     // {username,displayName,bio,email,reputation,isAdmin,isBot} or null
+let isGuest = false;
+let isAdmin = false;
+let theme = '';
+let currentOpenChallengeId = null;
+let ocFilt = 'all', resFilt = 'all';
+
+let PROBLEMS = [];
+let PROBLEM_SETS = [];
+let SOLVED_MAP = {};
+let RESOURCES = [];
+let LEADERBOARD = [];
+let MY_DUELS = [];
+
+// ============================================================================
+// API HELPER
+// ============================================================================
+async function api(path, opts={}) {
+  const headers = Object.assign({'Content-Type':'application/json'}, opts.headers||{});
+  if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
+  let res;
+  try {
+    res = await fetch(API_BASE + path, Object.assign({}, opts, { headers }));
+  } catch (e) {
+    throw new Error('Could not reach the backend. Is API_BASE set correctly, and is the server awake?');
+  }
+  let data = {};
+  try { data = await res.json(); } catch(e) { /* empty body is fine for some endpoints */ }
+  if (!res.ok) throw new Error(data.error || ('Request failed (' + res.status + ')'));
+  return data;
+}
+function setToken(t){ authToken=t; try{ if(t) localStorage.setItem('bi_token',t); else localStorage.removeItem('bi_token'); }catch(e){} }
 
 function rl(el){if(!el||!window.renderMathInElement)return;try{renderMathInElement(el,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false}],throwOnError:false});}catch(e){}}
 new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1)setTimeout(()=>rl(n),80);}).observe(document.body,{childList:true,subtree:true});
-function animStat(id,t){const el=document.getElementById(id);if(!el)return;let v=0;const s=Math.ceil(t/40);const x=setInterval(()=>{v=Math.min(v+s,t);el.textContent=v;if(v>=t)clearInterval(x);},40);}
+function animStat(id,t){const el=document.getElementById(id);if(!el)return;let v=0;const s=Math.ceil(Math.max(t,1)/40);const x=setInterval(()=>{v=Math.min(v+s,t);el.textContent=v;if(v>=t)clearInterval(x);},40);}
 
 function setTheme(t,btn){
   const wasA=document.body.classList.contains('admin-on');
@@ -1128,16 +1106,14 @@ function setTheme(t,btn){
   /* CRITICAL: force a full re-render of any open challenge view so the
      submit control updates immediately (fixes stale "Draft Solution" bug) */
   if(currentOpenChallengeId!==null&&document.getElementById('arena-ch')&&document.getElementById('arena-ch').style.display!=='none'){
-    openChallenge(currentOpenChallengeId);
+    renderChallengeDetail(currentOpenChallengeId);
   }
   updateAdminUI();
   setTimeout(()=>rl(document.body),80);
 }
 
 function updateAdminUI(){
-  document.querySelectorAll('.admin-only-btn').forEach(el=>{
-    el.style.display=isAdmin?'':'none';
-  });
+  document.querySelectorAll('.admin-only-btn').forEach(el=>{ el.style.display=isAdmin?'':'none'; });
   const note=document.getElementById('res-readonly-note');
   if(note)note.style.display=isAdmin?'none':'flex';
 }
@@ -1171,6 +1147,7 @@ function initMap(){
   walkers=HPNAMES.map(n=>({n,x:.1+Math.random()*.8,y:.1+Math.random()*.8,dir:Math.random()*Math.PI*2,speed:.0006+Math.random()*.001,ft:0,fi:25+Math.random()*20,feet:[],tr:Math.floor(Math.random()*ROOMS.length)}));
   if(mapAF)cancelAnimationFrame(mapAF);drawMap();
 }
+let mapAF=null,mapCtx=null,walkers=[];
 function drawMap(){
   if(!document.body.classList.contains('hp')){stopMap();return;}
   const c=document.getElementById('hp-canvas');if(!c||!mapCtx)return;
@@ -1206,6 +1183,8 @@ function stopMap(){if(mapAF){cancelAnimationFrame(mapAF);mapAF=null;}const c=doc
 window.addEventListener('resize',()=>{if(theme==='hp'){const c=document.getElementById('hp-canvas');if(c){c.width=window.innerWidth;c.height=window.innerHeight;}}if(owlCvs){owlCvs.width=window.innerWidth;owlCvs.height=window.innerHeight;}});
 
 // BARN OWL (canvas-drawn, no emoji)
+let bgOwlT=null,owlCvs=null,owlCtx=null,owlAF=null;
+const owls=[];
 function drawBarnOwl(ctx,cx,cy,span,flapT,opacity,dir){
   ctx.save();ctx.globalAlpha=opacity;
   if(dir<0){ctx.translate(cx,cy);ctx.scale(-1,1);ctx.translate(-cx,-cy);}
@@ -1261,11 +1240,11 @@ function stopBgOwls(){clearTimeout(bgOwlT);bgOwlT=null;owls.length=0;if(owlCtx&&
 function playDelivery(){spawnOwl({dir:-1,sz:60,alpha:.92,dur:4,delivery:true,wf:1.2,wa:20,wb:8,wc:3});}
 function playSend(){spawnOwl({dir:1,sz:58,alpha:.9,dur:3.2,wf:1,wa:18,wb:10,wc:4});}
 
-// PARCHMENT ("Draft Solution" flow in Owl theme)
-let parchChId=null;
+// PARCHMENT ("Draft Solution" flow in Owl theme) — now posts to the real API
+let parchChId=null,hwInt=null,hwD='',hwQ='';
 function openParch(id){
-  parchChId=id;const ch=CHALLENGES.find(c=>c.id===id);
-  document.getElementById('parch-ttl').textContent='Challenge by '+ch.author;
+  parchChId=id;const ch=PROBLEMS.find(c=>c._id===id);if(!ch)return;
+  document.getElementById('parch-ttl').textContent='Challenge by '+dispName(ch.author);
   const le=document.getElementById('parch-ltx');le.textContent=ch.body;
   document.getElementById('parch-ta').value='';document.getElementById('hw-out').textContent='';
   hwD='';hwQ='';const scroll=document.getElementById('parch-scroll');scroll.className='';scroll.style.transform='';
@@ -1278,16 +1257,22 @@ function openParch(id){
 function tickHW(){if(!hwQ.length){clearInterval(hwInt);hwInt=null;document.getElementById('hw-hand').classList.remove('vis');return;}hwD+=hwQ[0];hwQ=hwQ.slice(1);renderHW();}
 function renderHW(){document.getElementById('hw-out').textContent=hwD;}
 function parchPreview(){const le=document.getElementById('parch-ltx');le.textContent=document.getElementById('parch-ta').value;setTimeout(()=>rl(le),50);}
-function parchSubmit(){
+async function parchSubmit(){
   const txt=document.getElementById('parch-ta').value.trim();
   clearInterval(hwInt);hwInt=null;document.getElementById('hw-hand').classList.remove('vis');
   const s=document.getElementById('parch-scroll');s.classList.add('roll-up');
-  setTimeout(()=>{
+  const chId=parchChId;
+  setTimeout(async ()=>{
     document.getElementById('owl-parch-bg').classList.remove('active');s.classList.remove('roll-up');
     playSend();
-    if(txt&&parchChId!==null){const ch=CHALLENGES.find(c=>c.id===parchChId);if(ch)ch.sols.push({u:'you',t:txt,v:0,voted:false});}
     document.getElementById('parch-ta').value='';document.getElementById('hw-out').textContent='';hwD='';hwQ='';
-    if(currentOpenChallengeId===parchChId)openChallenge(parchChId);
+    if(txt&&chId!==null){
+      try{
+        const {problem}=await api(`/problems/${chId}/solutions`,{method:'POST',body:JSON.stringify({text:txt})});
+        const i=PROBLEMS.findIndex(p=>p._id===chId);if(i>=0)PROBLEMS[i]=problem;
+        if(currentOpenChallengeId===chId)renderChallengeDetail(chId);
+      }catch(e){alert('Could not send: '+e.message);}
+    }
   },900);
 }
 function closeParch(){document.getElementById('owl-parch-bg').classList.remove('active');clearInterval(hwInt);hwInt=null;}
@@ -1295,43 +1280,66 @@ function closeParch(){document.getElementById('owl-parch-bg').classList.remove('
 // HP SPARK ANIMATION (used on successful actions in HP theme)
 function hpAnim(el){if(!el)return;el.style.position='relative';for(let i=0;i<14;i++){const sp=document.createElement('div');const sz=3+Math.random()*4;sp.style.cssText=`position:absolute;width:${sz}px;height:${sz}px;border-radius:50%;background:hsl(${40+Math.random()*20},85%,60%);left:${10+Math.random()*80}%;top:${20+Math.random()*60}%;animation:sparkF ${.8+Math.random()*.5}s cubic-bezier(0.16,1,0.3,1) ${Math.random()*.4}s forwards;z-index:10;pointer-events:none`;el.appendChild(sp);setTimeout(()=>sp.remove(),1800);}}
 
-// DATA
-const CHALLENGES=[
-  {id:1,title:'Find all integer solutions to $$x^2 - y^2 = 2023$$',body:'Find all pairs of integers $(x, y)$ such that $$x^2 - y^2 = 2023.$$ Justify your answer completely.',author:'Arcturus_7',subj:'Number Theory',status:'active',timer:'2h 14m',sols:[{u:'Euler_reborn',t:'Factor: $(x-y)(x+y)=2023=7\\times17^2$. For each factor pair $(a,b)$ with $ab=2023$, same parity: $x=\\frac{a+b}{2}$, $y=\\frac{b-a}{2}$.',v:8,voted:false},{u:'Penelope_∞',t:'Since $2023=7\\cdot17^2$, enumerate same-parity factor pairs. $(1,2023)$ gives $x=1012, y=1011$.',v:5,voted:true}]},
-  {id:2,title:'Prove that $\\sqrt{2}+\\sqrt{3}$ is irrational',body:'Prove that $\\sqrt{2}+\\sqrt{3}$ is irrational. You may assume $\\sqrt{2}$ and $\\sqrt{3}$ are individually irrational.',author:'Penelope_∞',subj:'Analysis',status:'closed',timer:null,sols:[{u:'you',t:'Suppose $\\sqrt{2}+\\sqrt{3}=r\\in\\mathbb{Q}$. Then squaring $\\sqrt{3}=r-\\sqrt{2}$ gives $\\sqrt{2}=\\frac{r^2-1}{2r}\\in\\mathbb{Q}$ — contradiction.',v:47,voted:true},{u:'Gauss_Jr',t:'$(\\sqrt{2}+\\sqrt{3})(\\sqrt{3}-\\sqrt{2})=1$, so $\\sqrt{3}-\\sqrt{2}\\in\\mathbb{Q}$, hence $2\\sqrt{3}\\in\\mathbb{Q}$ — contradiction.',v:31,voted:false}]},
-  {id:3,title:'Evaluate $\\displaystyle\\int_0^1 x\\ln(x)\\,dx$',body:'Compute $$\\int_0^1 x\\ln(x)\\,dx.$$ Justify all steps, especially at $x=0$.',author:'you',subj:'Calculus',status:'active',timer:'23h 41m',sols:[{u:'Leibniz_Lives',t:'IBP: $u=\\ln x$, $dv=x\\,dx$: $$\\int_0^1 x\\ln x\\,dx=\\left[\\frac{x^2\\ln x}{2}\\right]_0^1-\\int_0^1\\frac{x}{2}\\,dx=0-\\frac{1}{4}=-\\frac{1}{4}$$',v:2,voted:false}]},
-  {id:4,title:'Prove $n^3-n$ is divisible by $6$ for all integers $n$',body:'Prove that $n^3-n$ is divisible by $6$ for every integer $n$.',author:'Gauss_Jr',subj:'Number Theory',status:'active',timer:'11h 05m',sols:[{u:'MathRookie99',t:'Factor: $n^3-n=n(n-1)(n+1)$. Among any 3 consecutive integers one is divisible by 2 and one by 3, so the product is divisible by 6.',v:12,voted:false}]}
-];
-const PS={
-  pre:{n:'Pre-Algebra Fundamentals',s:'Pre-Algebra',d:'Level 1',t:'ora',p:50,solved:[0,1,2,3,4],probs:[{s:'If $x+7=15$, find $3x-2$.',a:'$22$'},{s:'A train travels $240$ miles in $4$ hours. Speed?',a:'$60$ mph'},{s:'Simplify $\\dfrac{3}{4}+\\dfrac{2}{5}$.',a:'$\\dfrac{23}{20}$'},{s:'What is $15\\%$ of $80$?',a:'$12$'},{s:'Ratio boys:girls is $3:5$ and there are $40$ students. Boys?',a:'$15$'},{s:'Find all integers $n$ with $|n-3|<5$.',a:'$0\\le n\\le 7$'},{s:'Rectangle perimeter $28$, one side $6$. Area?',a:'$48$'},{s:'Evaluate $2^{10}$.',a:'$1024$'},{s:'$\\mathrm{lcm}(12,18)$?',a:'$36$'},{s:'$5$ apples cost $\\$3.75$, how much for $8$?',a:'$\\$6.00$'}]},
-  alg:{n:'Algebra Essentials',s:'Algebra',d:'Level 2',t:'blu',p:65,solved:[0,1,2,3,4,5,6],probs:[{s:'Solve $2x^2-5x-3=0$.'},{s:'Zeros of $f(x)=x^2-3x+2$?'},{s:'Expand $(x+3)^3$.'},{s:'Sum of roots of $x^3-6x^2+11x-6=0$?'},{s:'Solve: $3x+2y=12$, $x-y=1$.'},{s:'$k$ so $kx^2+4x+1=0$ has one real root?'},{s:'Simplify $\\dfrac{x^2-9}{x^2-x-6}$.'},{s:'Two consecutive integers with product $182$?'},{s:'Solve $\\log_2(x+1)+\\log_2(x-1)=3$.'},{s:'Real solutions to $\\sqrt{x+5}=x-1$?'},{s:'$a=3$, $d=4$. Find $S_{10}$.'},{s:'Factor: $6x^3-21x^2-12x$.'}]},
-  geo:{n:'Geometry Gauntlet',s:'Geometry',d:'Level 3',t:'grn',p:30,solved:[0,1,2],probs:[{s:'$\\triangle ABC$: $AB=5,BC=12,AC=13$. Show right-angled; find area.'},{s:'Circle radius $5$, point $P$ distance $13$ from center. Tangent length?'},{s:'Rhombus diagonals $10$ and $24$. Perimeter?'},{s:'Prove the angle in a semicircle is $90°$.'},{s:'Regular hexagon side $s$. Area in terms of $s$?'},{s:'Angle bisector from $A$ meets $BC$ at $D$. $AB=6,AC=9,BC=10$. Find $BD$.'},{s:'Circumradius of a $3$-$4$-$5$ triangle?'},{s:'Three unit circles mutually tangent. Area of curvilinear triangle?'},{s:'Cone height $h$, radius $r$. Lateral surface area?'},{s:'Co-interior angles $3x+20°$ and $2x+30°$. Find $x$.'},{s:"Prove Heron's formula."}]},
-  cnt:{n:'Counting & Probability',s:'Counting & Prob',d:'Level 2',t:'ora',p:80,solved:[0,1,2,3,4,5,6,7,8],probs:[{s:'Arrangements of $5$ books on a shelf?',a:'$120$'},{s:'Committee of $3$ from $10$?',a:'$120$'},{s:'$P$(exactly $3$ heads in $6$ flips)?',a:'$\\frac{5}{16}$'},{s:'Arrangements of MATHEMATICS?',a:'$4{,}989{,}600$'},{s:'Non-neg solutions to $x_1+x_2+x_3=10$?',a:'$66$'},{s:'$P$(sum prime) for two dice?',a:'$\\frac{5}{12}$'},{s:'Compute $\\dbinom{15}{6}$.',a:'$5005$'},{s:'$P$(2nd red|1st red), 5R 3B no replacement?',a:'$\\frac{4}{7}$'},{s:'Non-attacking rooks on $8\\times8$?',a:'$40320$'},{s:'Prove $\\sum_{k=0}^n\\binom{n}{k}=2^n$.'},{s:'$12$ people shake hands once each. Total?',a:'$66$'},{s:'$4$-digit numbers with digit sum $10$?'}]},
-  nt:{n:'Number Theory',s:'Number Theory',d:'Level 3',t:'blu',p:100,solved:[0,1,2,3,4,5,6,7,8,9,10,11],probs:[{s:'Prime factors of $2024$?',a:'$2^3\\cdot11\\cdot23$'},{s:'Prove $n^2\\equiv0$ or $1\\pmod4$.'},{s:'$n$ s.t. $5\\mid n^2-1$?',a:'$n\\equiv\\pm1\\pmod5$'},{s:'State and prove Fermat\'s Little Theorem.'},{s:'$\\gcd(1071,462)$ by Euclidean algorithm.',a:'$21$'},{s:'Prove infinitely many primes exist.'},{s:'Solve $7x\\equiv3\\pmod{11}$.',a:'$x\\equiv9$'},{s:'Trailing zeros in $100!$?',a:'$24$'},{s:'Prove $\\sqrt{2}$ is irrational.'},{s:'Primes $p$ with $p^2+2$ prime?',a:'$p=3$'},{s:'Prove: digit sum $\\equiv n\\pmod9$.'},{s:'Pythagorean triples with $a+b+c=60$?',a:'$(10,24,26)$ and $(15,20,25)$'}]},
-  calc:{n:'Calculus Core',s:'Calculus',d:'Level 4',t:'red',p:10,solved:[0],probs:[{s:'$\\displaystyle\\lim_{x\\to0}\\dfrac{\\sin x}{x}$',a:'$1$'},{s:'Differentiate $x^3\\ln x$.',a:'$x^2(3\\ln x+1)$'},{s:'Local extrema of $x^4-4x^3$?'},{s:'$\\displaystyle\\int_0^1x\\ln x\\,dx$',a:'$-\\tfrac{1}{4}$'},{s:'$\\displaystyle\\int\\frac{1}{x^2-1}\\,dx$'},{s:'Area between $y=x^2$ and $y=2x$.',a:'$\\frac{4}{3}$'},{s:'Derivative of $x^2$ from definition.'},{s:'$\\displaystyle\\int_0^\\pi x\\sin x\\,dx$',a:'$\\pi$'},{s:'Does $\\displaystyle\\int_1^\\infty\\frac{1}{x^2}\\,dx$ converge?',a:'Yes; $=1$'},{s:"L'Hôpital: $\\displaystyle\\lim_{x\\to0}\\dfrac{e^x-1-x}{x^2}$",a:'$\\frac{1}{2}$'},{s:'Taylor series for $\\sin x$ to $x^7$.'},{s:'$\\displaystyle\\iint_{x^2+y^2\\le4}x\\,dA$'}]},
-  ana:{n:'Real Analysis',s:'Analysis',d:'Level 5',t:'grn',p:5,solved:[],probs:[{s:'Prove $\\sqrt{2}+\\sqrt{3}$ is irrational.'},{s:'$\\varepsilon$-$\\delta$: prove $\\lim_{x\\to3}(2x+1)=7$.'},{s:'Prove every convergent sequence is Cauchy.'},{s:'Show $[0,1]$ is complete.'},{s:'Prove the Intermediate Value Theorem.'},{s:'Show $\\sum_{n=1}^\\infty\\frac{1}{n^2}$ converges.'},{s:'Uniformly continuous on bounded interval $\\Rightarrow$ bounded.'},{s:'State and prove Bolzano-Weierstrass.'},{s:"$f'\\equiv0\\Rightarrow f$ constant."},{s:'Prove $\\mathbb{Q}$ is dense in $\\mathbb{R}$.'},{s:'Cauchy sequence in $\\mathbb{Q}$ not converging in $\\mathbb{Q}$.'},{s:'Prove irrationals are uncountable.'}]}
-};
-const PLAYERS=[{u:'Arcturus_7',cr:2140,duels:12,solved:67},{u:'Penelope_∞',cr:3870,duels:21,solved:94},{u:'Gauss_Jr',cr:980,duels:8,solved:38},{u:'Leibniz_Lives',cr:720,duels:5,solved:29},{u:'EulerFan',cr:510,duels:4,solved:18}];
-
+// ============================================================================
 // AUTH
+// ============================================================================
 function showSec(id){['auth','signup'].forEach(s=>{const e=document.getElementById('sec-'+s);if(e)e.style.display=s===id?'':'none';});const el=document.getElementById('sec-'+id);if(el)setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),50);}
-function doLogin(){
+
+async function doLogin(){
   const u=document.getElementById('lu').value.trim(),p=document.getElementById('lp').value;
-  if(u===AU&&p===AP){isAdmin=true;isGuest=false;document.body.classList.add('admin-on');enterApp();showPage('admin');updateAdminUI();return;}
-  if(u.length>2&&p.length>3){isAdmin=false;isGuest=false;enterApp();return;}
-  const e=document.getElementById('login-err');e.style.display='block';setTimeout(()=>e.style.display='none',3000);
+  if(!u||!p){const e=document.getElementById('login-err');e.textContent='Please enter a username and password.';e.style.display='block';return;}
+  try{
+    const {token,user}=await api('/auth/login',{method:'POST',body:JSON.stringify({username:u,password:p})});
+    setToken(token);currentUser=user;isAdmin=!!user.isAdmin;isGuest=false;
+    if(isAdmin)document.body.classList.add('admin-on');
+    await enterApp();
+    if(isAdmin){renderAdminUsersTable();renderAdminChallengesTable();renderAdminResourcesTable();showPage('admin');}
+  }catch(e){
+    const el=document.getElementById('login-err');el.textContent=e.message;el.style.display='block';setTimeout(()=>el.style.display='none',4000);
+  }
 }
-function doSignup(){const n=document.getElementById('su-n').value.trim(),u=document.getElementById('su-u').value.trim();if(n&&u){isGuest=false;enterApp();}else alert('Please fill in display name and username.');}
-function guestLogin(){isGuest=true;isAdmin=false;enterApp();}
-function goRes(){isGuest=true;isAdmin=false;enterApp();setTimeout(()=>showPage('resources'),100);}
-function enterApp(){
+async function doSignup(){
+  const n=document.getElementById('su-n').value.trim(),u=document.getElementById('su-u').value.trim();
+  const email=document.getElementById('su-email').value.trim();
+  const p=document.getElementById('su-p').value,p2=document.getElementById('su-p2').value;
+  if(!n||!u){alert('Please fill in display name and username.');return;}
+  if(p.length<4){alert('Password must be at least 4 characters.');return;}
+  if(p!==p2){alert('Passwords do not match.');return;}
+  try{
+    const {token,user}=await api('/auth/register',{method:'POST',body:JSON.stringify({username:u,password:p,displayName:n,email})});
+    setToken(token);currentUser=user;isAdmin=false;isGuest=false;
+    await enterApp();
+  }catch(e){ alert(e.message); }
+}
+async function guestLogin(){isGuest=true;isAdmin=false;currentUser=null;await enterApp();}
+async function goRes(){isGuest=true;isAdmin=false;currentUser=null;await enterApp();setTimeout(()=>showPage('resources'),100);}
+
+async function tryAutoLogin(){
+  if(!authToken)return false;
+  try{
+    const {user}=await api('/auth/me');
+    currentUser=user;isAdmin=!!user.isAdmin;isGuest=false;
+    if(isAdmin)document.body.classList.add('admin-on');
+    await enterApp();
+    return true;
+  }catch(e){
+    setToken(null);currentUser=null;
+    return false;
+  }
+}
+
+async function enterApp(){
   document.getElementById('landing').style.display='none';document.getElementById('app').style.display='block';
   document.getElementById('g-ind').style.display=isGuest?'inline-flex':'none';
   document.getElementById('g-notice').style.display=isGuest?'':'none';
-  renderChallenges();renderPS();showPage('arena');initOwlCanvas();updateAdminUI();
+  updateRepPill();
+  initOwlCanvas();updateAdminUI();
+  showPage('arena');
+  await loadAppData();
 }
+
 function doLogout(){
-  isGuest=false;isAdmin=false;document.body.classList.remove('admin-on');
+  setToken(null);currentUser=null;isGuest=false;isAdmin=false;document.body.classList.remove('admin-on');
   document.getElementById('app').style.display='none';document.getElementById('landing').style.display='block';
   document.getElementById('g-ind').style.display='none';currentOpenChallengeId=null;
   stopMap();stopBgOwls();stopHPP();
@@ -1339,7 +1347,48 @@ function doLogout(){
 }
 function logoutAdmin(){isAdmin=false;document.body.classList.remove('admin-on');updateAdminUI();}
 
+function updateRepPill(){
+  const disp=document.getElementById('cdisp');
+  if(disp)disp.textContent=currentUser?currentUser.reputation.toLocaleString():'—';
+}
+
+function openSettings(){populateProfileFields();renderProfileStats();showPage('settings');}
+function populateProfileFields(){
+  const n=document.getElementById('set-name'),u=document.getElementById('set-username'),b=document.getElementById('set-bio'),e=document.getElementById('set-email');
+  if(!currentUser){ if(n)n.value='Guest';if(u)u.value='guest';if(b)b.value='';if(e)e.value=''; return; }
+  if(n)n.value=currentUser.displayName||'';
+  if(u)u.value=currentUser.username||'';
+  if(b)b.value=currentUser.bio||'';
+  if(e)e.value=currentUser.email||'';
+}
+async function saveProfile(){
+  if(!currentUser){alert('Sign in to edit your profile.');return;}
+  try{
+    const {user}=await api('/auth/me',{method:'PUT',body:JSON.stringify({
+      displayName:document.getElementById('set-name').value.trim(),
+      bio:document.getElementById('set-bio').value.trim(),
+      email:document.getElementById('set-email').value.trim()
+    })});
+    currentUser=user;
+    alert('Profile saved.');
+  }catch(e){ alert(e.message); }
+}
+function renderProfileStats(){
+  const repEl=document.getElementById('stat-rep');if(repEl)repEl.textContent=currentUser?currentUser.reputation.toLocaleString():'0';
+  const dwEl=document.getElementById('stat-duelswon');if(dwEl)dwEl.textContent=currentUser?MY_DUELS.filter(d=>d.status==='completed'&&d.winner===currentUser.username).length:0;
+  const slEl=document.getElementById('stat-solved');if(slEl)slEl.textContent=totalSolvedCount();
+  const upEl=document.getElementById('stat-upvotes');
+  if(upEl){let up=0;if(currentUser)PROBLEMS.forEach(c=>c.solutions.forEach(s=>{if(s.author===currentUser.username)up+=s.votes;}));upEl.textContent=up;}
+}
+function totalSolvedCount(){
+  let n=0;Object.values(SOLVED_MAP).forEach(arr=>n+=arr.length);
+  if(currentUser)n+=PROBLEMS.filter(c=>c.solutions.some(s=>s.author===currentUser.username)).length;
+  return n;
+}
+
+// ============================================================================
 // PAGE NAV
+// ============================================================================
 function showPage(pg){
   document.querySelectorAll('#app .page').forEach(p=>p.classList.remove('on'));
   const el=document.getElementById('page-'+pg);if(el){el.classList.add('on');setTimeout(()=>rl(el),80);}
@@ -1348,121 +1397,103 @@ function showPage(pg){
   if(idx!==undefined){const t=document.querySelectorAll('.tab')[idx];if(t)t.classList.add('on');}
 }
 function switchTab(pg,btn){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));if(btn)btn.classList.add('on');showPage(pg);}
-function switchInner(panel,btn){document.getElementById('panel-oc').style.display=panel==='oc'?'':'none';document.getElementById('panel-dd').style.display=panel==='dd'?'':'none';document.querySelectorAll('#panel-oc, #panel-dd').forEach(()=>{});document.querySelectorAll('.inner-tabs .itab').forEach(b=>{if(b.closest('#page-arena'))b.classList.remove('on');});btn.classList.add('on');}
-function switchAdmin(p,btn){['users','challenges','resources','disputes'].forEach(id=>{const e=document.getElementById('adm-'+id);if(e)e.style.display=id===p?'':'none';});document.querySelectorAll('#page-admin .itab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
-function showSett(s,btn){['profile','password','display','stats'].forEach(id=>{document.getElementById('sett-'+id).style.display=id===s?'':'none';});document.querySelectorAll('#snav button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
-function backArena(){currentOpenChallengeId=null;document.getElementById('arena-main').style.display='block';document.getElementById('arena-ch').style.display='none';document.getElementById('arena-duel').style.display='none';}
-function openActiveDuel(){document.getElementById('arena-main').style.display='none';document.getElementById('arena-ch').style.display='none';document.getElementById('arena-duel').style.display='block';}
+function switchInner(panel,btn){document.getElementById('panel-oc').style.display=panel==='oc'?'':'none';document.getElementById('panel-dd').style.display=panel==='dd'?'':'none';document.querySelectorAll('.inner-tabs .itab').forEach(b=>{if(b.closest('#page-arena'))b.classList.remove('on');});btn.classList.add('on');if(panel==='dd')renderDuelsPanel();}
+function switchAdmin(p,btn){['users','challenges','resources','disputes'].forEach(id=>{const e=document.getElementById('adm-'+id);if(e)e.style.display=id===p?'':'none';});document.querySelectorAll('#page-admin .itab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');if(p==='users')renderAdminUsersTable();if(p==='challenges')renderAdminChallengesTable();if(p==='resources')renderAdminResourcesTable();}
+function showSett(s,btn){['profile','password','display','stats'].forEach(id=>{document.getElementById('sett-'+id).style.display=id===s?'':'none';});document.querySelectorAll('#snav button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');if(s==='profile')populateProfileFields();if(s==='stats')renderProfileStats();}
+function backArena(){currentOpenChallengeId=null;document.getElementById('arena-main').style.display='block';document.getElementById('arena-ch').style.display='none';}
 
 // DROPDOWNS
 function toggleDD(id){const m=document.getElementById(id);const was=m.classList.contains('open');closeDD();if(!was)m.classList.add('open');}
 function closeDD(){document.querySelectorAll('.ddmenu').forEach(m=>m.classList.remove('open'));}
 document.addEventListener('click',e=>{if(!e.target.closest('.ddwrap'))closeDD();});
 
-// OC FILTER
+// ============================================================================
+// DATA LOADING
+// ============================================================================
+async function loadAppData(){
+  try{
+    const tasks=[api('/problems'),api('/sets'),api('/resources'),api('/players/leaderboard')];
+    const [pRes,sRes,rRes,lRes]=await Promise.all(tasks);
+    PROBLEMS=pRes.problems;PROBLEM_SETS=sRes.sets;RESOURCES=rRes.resources;LEADERBOARD=lRes.leaderboard;
+    if(currentUser){
+      const [solvedRes,duelsRes]=await Promise.all([api('/sets/solved'),api('/duels')]);
+      SOLVED_MAP=solvedRes.solved;MY_DUELS=duelsRes.duels;
+    } else { SOLVED_MAP={};MY_DUELS=[]; }
+    renderChallenges();renderPS();renderResourceCards();renderDuelsPanel();
+    animateAllStats();
+  }catch(e){
+    console.error(e);
+    const el=document.getElementById('ch-list');
+    if(el)el.innerHTML=`<div class="card" style="text-align:center;color:var(--red-t);padding:24px">Could not reach the backend (${e.message}). Check that API_BASE near the top of the script points at your deployed server.</div>`;
+  }
+}
+async function refreshUser(){
+  if(!currentUser)return;
+  try{ const {user}=await api('/auth/me'); currentUser=user; updateRepPill(); }catch(e){}
+}
+
+function animateAllStats(){
+  const activityFlavor=2; // two bots are duelling each other in the background, for flavor only
+  animStat('st1',PROBLEMS.length);animStat('st2',activityFlavor);animStat('st3',PROBLEM_SETS.length);
+  animStat('about-st1',PROBLEMS.length);animStat('about-st2',activityFlavor);animStat('about-st3',PROBLEM_SETS.length);
+}
+
+// ============================================================================
+// FORUM CHALLENGES — list + detail view
+// ============================================================================
 function filterOC(s,btn){ocFilt=s;document.querySelectorAll('#oc-chips .chip').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderChallenges();}
 
-// LEADERBOARD (working menu)
-function showLB(){
-  const lb=[{u:'Penelope_∞',cr:3870,duels:21,solved:94},{u:'Arcturus_7',cr:2140,duels:12,solved:67},{u:'you',cr:userRep,duels:9,solved:43},{u:'Gauss_Jr',cr:980,duels:8,solved:38},{u:'Leibniz_Lives',cr:720,duels:5,solved:29},{u:'EulerFan',cr:510,duels:4,solved:18}];
-  lb.sort((a,b)=>b.cr-a.cr);
-  const rankCls=['gold','silver','bronze'];
-  document.getElementById('lb-list').innerHTML=lb.map((p,i)=>`<div class="lb-row"><div class="lb-rank ${rankCls[i]||''}">${i+1}</div><div class="lb-av">${p.u.substring(0,2).toUpperCase()}</div><div style="flex:1;min-width:0"><div class="lb-name">${p.u}${p.u==='you'?'<span class="badge grn" style="font-size:10px;margin-left:6px">You</span>':''}</div><div style="font-size:11px;color:var(--text3)">${p.duels} duels · ${p.solved} solved</div></div><div class="lb-rep">✦ ${p.cr.toLocaleString()}</div></div>`).join('');
-  document.getElementById('lb-modal').classList.add('open');
-}
-
-// MY SUBMISSIONS (working page/modal)
-function showMySubs(){
-  const mine=CHALLENGES.filter(c=>c.author==='you');
-  const el=document.getElementById('subs-list');
-  if(mine.length===0){
-    el.innerHTML='<div style="padding:32px;text-align:center;color:var(--text3)">You have not posted any challenges yet. Use "Post a problem" from the Challenge menu to create one.</div>';
-    document.getElementById('subs-modal').classList.add('open');return;
-  }
-  el.innerHTML=mine.map(c=>{
-    const titlePlain=c.title.replace(/\$\$?([^$]*)\$\$?/g,'$1').slice(0,90);
-    return `<div class="sub-item"><div class="sub-title">${titlePlain}${c.title.length>90?'…':''}</div><div class="meta" style="margin-bottom:8px"><span class="badge ${c.status==='active'?'grn':'red'}" style="font-size:11px">${c.status==='active'?'Open':'Voting'}</span><span class="badge ora" style="font-size:11px">${c.subj}</span><span>${c.sols.length} solution${c.sols.length!==1?'s':''}</span>${c.timer?`<span style="display:inline-flex;align-items:center;gap:3px"><svg style="width:12px;height:12px;stroke:currentColor;fill:none"><use href="#ic-timer"/></svg>${c.timer}</span>`:''}</div><button class="btng" style="font-size:12px" onclick="closeModal('subs-modal');openChallenge(${c.id})">View challenge →</button></div>`;
-  }).join('');
-  document.getElementById('subs-modal').classList.add('open');
-}
-
-// CHALLENGES — list + detail view
 function renderChallenges(){
   const el=document.getElementById('ch-list');if(!el)return;
-  const list=ocFilt==='all'?CHALLENGES:CHALLENGES.filter(c=>c.subj===ocFilt);
+  const list=ocFilt==='all'?PROBLEMS:PROBLEMS.filter(c=>c.subject===ocFilt);
   if(list.length===0){el.innerHTML='<div class="card" style="text-align:center;color:var(--text3);padding:30px">No challenges in this subject yet.</div>';return;}
-  el.innerHTML=list.map((c,i)=>`<div class="card card-click anim-in" onclick="openChallenge(${c.id})" style="animation-delay:${i*.05}s"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px"><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:500;font-family:var(--font-d);color:var(--text)">${c.title}</div><div class="meta" style="margin-top:6px"><span>by <strong>${c.author}</strong></span><span class="badge ${c.status==='active'?'grn':'red'}" style="font-size:11px">${c.status==='active'?'Open':'Voting'}</span><span class="badge ora" style="font-size:11px">${c.subj}</span></div></div>${c.timer?`<div class="timer" style="flex-shrink:0"><svg style="width:12px;height:12px;stroke:currentColor;fill:none;display:inline"><use href="#ic-timer"/></svg> ${c.timer}</div>`:''}</div><div class="meta">${c.sols.length} solution${c.sols.length!==1?'s':''} · ${c.status==='active'?'Accepting':'Closed'} · ✦ +5/upvote</div></div>`).join('');
+  el.innerHTML=list.map((c,i)=>`<div class="card card-click anim-in" onclick="renderChallengeDetail('${c._id}')" style="animation-delay:${i*.05}s"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px"><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:500;font-family:var(--font-d);color:var(--text)">${c.title}</div><div class="meta" style="margin-top:6px"><span>by <strong>${dispName(c.author)}</strong></span><span class="badge ${c.status==='active'?'grn':'red'}" style="font-size:11px">${c.status==='active'?'Open':'Voting'}</span><span class="badge ora" style="font-size:11px">${c.subject}</span></div></div></div><div class="meta">${c.solutions.length} solution${c.solutions.length!==1?'s':''} · ${c.status==='active'?'Accepting':'Closed'} · ✦ +5/upvote</div></div>`).join('');
   setTimeout(()=>rl(el),80);
 }
-function openChallenge(id){
+
+function renderChallengeDetail(id){
   currentOpenChallengeId=id;
-  const c=CHALLENGES.find(x=>x.id===id);
-  document.getElementById('arena-main').style.display='none';document.getElementById('arena-duel').style.display='none';document.getElementById('arena-ch').style.display='block';
+  const c=PROBLEMS.find(x=>x._id===id);if(!c){backArena();return;}
+  document.getElementById('arena-main').style.display='none';document.getElementById('arena-ch').style.display='block';
   const isA=c.status==='active';
-  let html=`<button class="back-btn" onclick="backArena()"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-chevron-left"/></svg> Back</button><div style="font-size:17px;font-weight:600;font-family:var(--font-d);color:var(--text);margin-bottom:6px">${c.title}</div><div class="meta" style="margin-bottom:12px"><span>by <strong>${c.author}</strong></span><span class="badge ${isA?'grn':'red'}" style="font-size:11px">${isA?'Open':'Voting'}</span><span class="badge ora" style="font-size:11px">${c.subj}</span>${c.timer?`<span class="timer" style="font-size:11px"><svg style="width:12px;height:12px;stroke:currentColor;fill:none;display:inline"><use href="#ic-timer"/></svg> ${c.timer}</span>`:''}</div><div class="latex-box">${c.body}</div>`;
-  if(isA&&!isGuest){
-    /* This branch is rebuilt on every theme switch via setTheme() -> openChallenge(),
+  const me=currentUser?currentUser.username:null;
+  let html=`<button class="back-btn" onclick="backArena()"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-chevron-left"/></svg> Back</button><div style="font-size:17px;font-weight:600;font-family:var(--font-d);color:var(--text);margin-bottom:6px">${c.title}</div><div class="meta" style="margin-bottom:12px"><span>by <strong>${dispName(c.author)}</strong></span><span class="badge ${isA?'grn':'red'}" style="font-size:11px">${isA?'Open':'Voting'}</span><span class="badge ora" style="font-size:11px">${c.subject}</span></div><div class="latex-box">${c.body}</div>`;
+  if(isA&&!isGuest&&currentUser){
+    /* This branch is rebuilt on every theme switch via setTheme() -> renderChallengeDetail(),
        which is the explicit fix for the "stale Draft Solution button" bug. */
     if(theme==='owl'){
-      html+=`<div style="margin:16px 0"><button class="btn" style="background:#4a2c08;border-color:#4a2c08;color:#f8edd8" onclick="openParch(${c.id})"><svg class="ic ic-sm" style="stroke:#f8edd8"><use href="#ic-scroll"/></svg> Draft Solution</button><div style="font-size:12px;color:var(--text3);margin-top:6px;font-style:italic">Your writing appears in handwritten form on a scroll, then is sent by owl.</div></div>`;
+      html+=`<div style="margin:16px 0"><button class="btn" style="background:#4a2c08;border-color:#4a2c08;color:#f8edd8" onclick="openParch('${c._id}')"><svg class="ic ic-sm" style="stroke:#f8edd8"><use href="#ic-scroll"/></svg> Draft Solution</button><div style="font-size:12px;color:var(--text3);margin-top:6px;font-style:italic">Your writing appears in handwritten form on a scroll, then is sent by owl.</div></div>`;
     } else {
-      html+=`<div class="card" style="margin-top:14px" id="sol-card-${id}"><div style="font-size:14px;font-weight:600;margin-bottom:8px;color:var(--text)">Submit your solution</div><div style="font-size:12px;color:var(--text3);margin-bottom:8px">LaTeX supported: $...$ inline, $$...$$ display. Leave blank if you're still working on it.</div><textarea class="inp" id="sol-inp" placeholder="Your solution here, or leave blank if you're still working on it..." style="min-height:100px"></textarea><div id="sol-prev" class="latex-box" style="display:none;margin-bottom:8px"></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btng" onclick="prevSol()">Preview LaTeX</button><button class="btn" id="sol-btn" onclick="submitSol(${id})"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-check"/></svg> Submit solution</button></div></div>`;
+      html+=`<div class="card" style="margin-top:14px"><div style="font-size:14px;font-weight:600;margin-bottom:8px;color:var(--text)">Submit your solution</div><div style="font-size:12px;color:var(--text3);margin-bottom:8px">LaTeX supported: $...$ inline, $$...$$ display.</div><textarea class="inp" id="sol-inp" placeholder="Your solution here..." style="min-height:100px"></textarea><div id="sol-prev" class="latex-box" style="display:none;margin-bottom:8px"></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btng" onclick="prevSol()">Preview LaTeX</button><button class="btn" onclick="submitSol('${id}')"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-check"/></svg> Submit solution</button></div></div>`;
     }
-  } else if(isGuest&&isA){
+  } else if((isGuest||!currentUser)&&isA){
     html+=`<div class="card" style="background:var(--ora-bg);border-color:var(--ora-bd);margin-top:12px"><div style="font-size:13px;color:var(--ora-t)">Sign in to submit solutions and earn reputation.</div></div>`;
   }
-  if(theme==='owl'&&isA&&c.sols.length>0){
-    html+=`<div style="background:var(--grn-bg);border:1.5px solid var(--grn-bd);border-radius:var(--r);padding:10px 14px;margin:12px 0;font-size:13px;color:var(--grn-t);display:flex;align-items:center;gap:8px"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-mail"/></svg> An owl delivered a new solution from <strong>${c.sols[c.sols.length-1].u}</strong>!<button class="btng" style="font-size:12px;margin-left:auto;border-color:var(--grn-bd);color:var(--grn-t)" onclick="playDelivery()">Watch delivery</button></div>`;
-  }
-  html+=`<div style="font-size:16px;font-weight:600;margin:18px 0 12px;color:var(--text);font-family:var(--font-d)">${c.sols.length} solution${c.sols.length!==1?'s':''}</div>`;
-  if(c.sols.length===0){html+=`<div class="card" style="text-align:center;color:var(--text3);padding:24px">No solutions submitted yet.</div>`;}
-  c.sols.forEach((s,i)=>{html+=`<div class="card anim-in" style="animation-delay:${i*.05}s"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><div class="cav">${s.u.substring(0,2).toUpperCase()}</div><span style="font-size:14px;font-weight:600;color:var(--text)">${s.u}</span>${s.u==='you'?'<span class="badge grn" style="font-size:11px">Yours</span>':''}</div><div class="latex-box" style="background:transparent;border:none;padding:4px 0;color:var(--text)">${s.t}</div>${!isA?`<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap"><button class="btnvote ${s.voted?'on':''}" onclick="vote(${id},${i},this)"><svg style="width:12px;height:12px;stroke:currentColor;fill:none;display:inline"><use href="#ic-arrow-up"/></svg> ${s.v} upvote${s.v!==1?'s':''}</button><button class="btng" style="font-size:12px" onclick="alert('Opens comment thread')"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-comment"/></svg> Comment</button>${s.u!=='you'?`<button class="btng" style="font-size:12px;color:var(--red-t);border-color:var(--red-bd)" onclick="alert('Opens dispute vote')"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-flag"/></svg> Dispute</button>`:''}</div>`:''}</div>`;});
-  if(!isA){html+=`<div style="font-size:16px;font-weight:600;margin:18px 0 12px;color:var(--text);font-family:var(--font-d)">Discussion</div><div class="card"><div style="display:flex;gap:8px;margin-bottom:10px"><div class="cav">MR</div><div><span style="font-size:13px;font-weight:600;color:var(--text)">MathRookie99</span><div style="font-size:13px;color:var(--text2);margin-top:2px">Does this generalise to $\\sqrt{p}+\\sqrt{q}$ for distinct primes?</div></div></div><div style="display:flex;gap:8px;margin-bottom:12px"><div class="cav">PE</div><div><span style="font-size:13px;font-weight:600;color:var(--text)">Penelope_∞</span><div style="font-size:13px;color:var(--text2);margin-top:2px">Yes! The minimal polynomial of $\\sqrt{p}+\\sqrt{q}$ over $\\mathbb{Q}$ has degree $4$, so it cannot be rational.</div></div></div><textarea class="inp" placeholder="Add a comment... $LaTeX$ supported" style="min-height:55px" ${isGuest?'disabled':''}></textarea><button class="btn2" style="margin-top:8px;font-size:13px" ${isGuest?'disabled':''}>Post comment</button></div>`;}
+  html+=`<div style="font-size:16px;font-weight:600;margin:18px 0 12px;color:var(--text);font-family:var(--font-d)">${c.solutions.length} solution${c.solutions.length!==1?'s':''}</div>`;
+  if(c.solutions.length===0){html+=`<div class="card" style="text-align:center;color:var(--text3);padding:24px">No solutions submitted yet.</div>`;}
+  c.solutions.forEach((s,i)=>{
+    const voted=me&&s.voters.includes(me);
+    html+=`<div class="card anim-in" style="animation-delay:${i*.05}s"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><div class="cav">${dispName(s.author).substring(0,2).toUpperCase()}</div><span style="font-size:14px;font-weight:600;color:var(--text)">${dispName(s.author)}</span>${me&&s.author===me?'<span class="badge grn" style="font-size:11px">Yours</span>':''}${isBotUsername(s.author)?'<span class="badge" style="font-size:10px">Bot</span>':''}</div><div class="latex-box" style="background:transparent;border:none;padding:4px 0;color:var(--text)">${s.text}</div>${!isA?`<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap"><button class="btnvote ${voted?'on':''}" onclick="vote('${id}',${i})" ${!currentUser?'disabled':''}><svg style="width:12px;height:12px;stroke:currentColor;fill:none;display:inline"><use href="#ic-arrow-up"/></svg> ${s.votes} upvote${s.votes!==1?'s':''}</button></div>`:''}</div>`;
+  });
   document.getElementById('ch-inner').innerHTML=html;setTimeout(()=>rl(document.getElementById('ch-inner')),80);
 }
 function prevSol(){const t=document.getElementById('sol-inp').value;const p=document.getElementById('sol-prev');p.style.display='block';p.textContent=t;setTimeout(()=>rl(p),50);}
-function submitSol(id){
+async function submitSol(id){
   const t=document.getElementById('sol-inp').value.trim();
-  const c=CHALLENGES.find(x=>x.id===id);
-  c.sols.push({u:'you',t:t||'(solution pending — placeholder submitted)',v:0,voted:false});
-  openChallenge(id);
+  try{
+    const {problem}=await api(`/problems/${id}/solutions`,{method:'POST',body:JSON.stringify({text:t})});
+    const i=PROBLEMS.findIndex(p=>p._id===id);if(i>=0)PROBLEMS[i]=problem;
+    renderChallengeDetail(id);renderProfileStats();
+  }catch(e){ alert(e.message); }
 }
-function vote(cid,si,btn){
-  const c=CHALLENGES.find(x=>x.id===cid);const s=c.sols[si];
-  if(s.voted){s.v--;s.voted=false;}else{s.v++;s.voted=true;if(s.u==='you'){bumpRep(5);}}
-  openChallenge(cid);
-}
-function bumpRep(n){
-  userRep+=n;
-  const disp=document.getElementById('cdisp');if(disp)disp.textContent=userRep.toLocaleString();
-  const pill=document.getElementById('cpill');if(pill){pill.classList.remove('bump');void pill.offsetWidth;pill.classList.add('bump');}
-}
-
-// RESOURCES — problem sets
-function rFilt(k,btn){resFilt=k;document.querySelectorAll('#rfilt .chip').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderPS();}
-function renderPS(){
-  const el=document.getElementById('ps-list');if(!el)return;
-  const keys=resFilt==='all'?Object.keys(PS):[resFilt];
-  el.innerHTML=keys.map((k,i)=>{
-    const v=PS[k];const pct=Math.round((v.solved.length/v.probs.length)*100);
-    return `<div class="card card-click anim-in" onclick="openPS('${k}')" style="animation-delay:${i*.05}s">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-        <div><div style="font-size:15px;font-weight:600;font-family:var(--font-d);color:var(--text)">${v.n}</div>
-          <div class="meta" style="margin-top:4px"><span class="badge ${v.t}" style="font-size:11px">${v.s}</span><span class="badge" style="font-size:11px">${v.d}</span><span>${v.probs.length} problems</span></div></div>
-        <div style="text-align:right;flex-shrink:0"><div style="font-size:12px;font-weight:600;color:var(--text)">${v.solved.length}/${v.probs.length} solved</div>
-          <div class="pr-bar" style="margin-top:6px"><div class="pr-fill" style="width:${pct}%"></div></div></div>
-      </div></div>`;
-  }).join('');
-  setTimeout(()=>rl(el),80);
-}
-function openPS(key){
-  const v=PS[key];const el=document.getElementById('ps-content');
-  let html=`<div class="sec-hdr"><div><div class="sec-t">${v.n}</div><div class="sec-sub">${v.probs.length} problems · ${v.solved.length} solved</div></div><span class="badge ${v.t}">${v.d}</span></div>`;
-  v.probs.forEach((p,i)=>{
-    const solved=v.solved.includes(i);
-    html+=`<div class="card"><div style="display:flex;align-items:flex-start;gap:10px;justify-content:space-between"><div style="flex:1"><div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:4px">PROBLEM ${i+1}</div><div class="latex-box" style="margin:0">${p.s}</div></div>${solved?'<span class="badge grn" style="flex-shrink:0">Solved</span>':'<span class="badge" style="flex-shrink:0">Unsolved</span>'}</div>${p.a&&solved?`<div style="font-size:12px;color:var(--text3);margin-top:8px">Answer: <span style="color:var(--text2);font-weight:600">${p.a}</span></div>`:''}</div>`;
-  });
-  el.innerHTML=html;showPage('problemset');setTimeout(()=>rl(el),80);
+async function vote(cid,si){
+  if(!currentUser){alert('Sign in to vote.');return;}
+  try{
+    const {problem}=await api(`/problems/${cid}/solutions/${si}/vote`,{method:'POST'});
+    const i=PROBLEMS.findIndex(p=>p._id===cid);if(i>=0)PROBLEMS[i]=problem;
+    renderChallengeDetail(cid);
+    await refreshUser();
+  }catch(e){ alert(e.message); }
 }
 
 // POST CHALLENGE MODAL
@@ -1472,27 +1503,276 @@ function openPostModal(){
   document.getElementById('post-modal').classList.add('open');
 }
 function prevPost(){const t=document.getElementById('pp').value;const p=document.getElementById('pp-prev');p.style.display='block';p.textContent=t;setTimeout(()=>rl(p),50);}
-function submitPost(){
+async function submitPost(){
   const body=document.getElementById('pp').value.trim();
   if(!body){alert('Please enter a problem statement.');return;}
-  const subj=document.getElementById('ps-subj').value;
-  const time=document.getElementById('ps-time').value;
-  const sol=document.getElementById('ps-sol').value.trim();
-  const id=Math.max(...CHALLENGES.map(c=>c.id))+1;
-  const plainTitle=body.replace(/\$\$?([^$]*)\$\$?/g,'$1').slice(0,70)+(body.length>70?'…':'');
-  CHALLENGES.unshift({id,title:body.length>0?body.slice(0,90):plainTitle,body,author:'you',subj,status:'active',timer:time,sols:sol?[{u:'you',t:sol,v:0,voted:false}]:[]});
-  ocFilt='all';
-  document.querySelectorAll('#oc-chips .chip').forEach(b=>b.classList.remove('on'));
-  const allChip=document.querySelector('#oc-chips .chip');if(allChip)allChip.classList.add('on');
-  renderChallenges();
-  closeModal('post-modal');
-  openChallenge(id);
+  const subject=document.getElementById('ps-subj').value;
+  const timeLabel=document.getElementById('ps-time').value;
+  const hoursMap={'1 hour':1,'6 hours':6,'24 hours':24,'48 hours':48,'1 week':168};
+  const durationHours=hoursMap[timeLabel]||24;
+  const initialSolution=document.getElementById('ps-sol').value.trim();
+  try{
+    const {problem}=await api('/problems',{method:'POST',body:JSON.stringify({body,subject,durationHours,initialSolution})});
+    PROBLEMS.unshift(problem);
+    ocFilt='all';
+    document.querySelectorAll('#oc-chips .chip').forEach(b=>b.classList.remove('on'));
+    const allChip=document.querySelector('#oc-chips .chip');if(allChip)allChip.classList.add('on');
+    renderChallenges();closeModal('post-modal');renderChallengeDetail(problem._id);
+  }catch(e){ alert(e.message); }
 }
 
-// DUEL CHALLENGE — multi-step modal
-let duelState={step:1,target:null,loadout:[null,null,null],forumP:null,origProb:'',origSol:'',pickingSlot:null};
+// MY SUBMISSIONS
+function showMySubs(){
+  if(!currentUser){alert('Sign in to see your submissions.');return;}
+  const mine=PROBLEMS.filter(c=>c.author===currentUser.username);
+  const el=document.getElementById('subs-list');
+  if(mine.length===0){
+    el.innerHTML='<div style="padding:32px;text-align:center;color:var(--text3)">You have not posted any challenges yet. Use "Post a problem" from the Challenge menu to create one.</div>';
+    document.getElementById('subs-modal').classList.add('open');return;
+  }
+  el.innerHTML=mine.map(c=>{
+    const titlePlain=c.title.replace(/\$\$?([^$]*)\$\$?/g,'$1').slice(0,90);
+    return `<div class="sub-item"><div class="sub-title">${titlePlain}${c.title.length>90?'…':''}</div><div class="meta" style="margin-bottom:8px"><span class="badge ${c.status==='active'?'grn':'red'}" style="font-size:11px">${c.status==='active'?'Open':'Voting'}</span><span class="badge ora" style="font-size:11px">${c.subject}</span><span>${c.solutions.length} solution${c.solutions.length!==1?'s':''}</span></div><button class="btng" style="font-size:12px" onclick="closeModal('subs-modal');renderChallengeDetail('${c._id}')">View challenge →</button></div>`;
+  }).join('');
+  document.getElementById('subs-modal').classList.add('open');
+}
+
+// ============================================================================
+// PROBLEM SETS — now with real per-user solved tracking (this is what
+// unblocks duels: you can only put a set-problem in a duel loadout once
+// you've actually solved it here).
+// ============================================================================
+function rFilt(k,btn){resFilt=k;document.querySelectorAll('#rfilt .chip').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderPS();}
+function renderPS(){
+  const el=document.getElementById('ps-list');if(!el)return;
+  const list=resFilt==='all'?PROBLEM_SETS:PROBLEM_SETS.filter(s=>s.key===resFilt);
+  el.innerHTML=list.map((v,i)=>{
+    const solvedCount=(SOLVED_MAP[v.key]||[]).length;
+    const total=v.problemCount!==undefined?v.problemCount:v.problems.length;
+    const pct=total?Math.round((solvedCount/total)*100):0;
+    const clickFn=v.unlocked?`openPS('${v.key}')`:`openUnlockModal('${v.key}')`;
+    const rightCol=v.unlocked
+      ?`<div style="text-align:right;flex-shrink:0"><div style="font-size:12px;font-weight:600;color:var(--text)">${solvedCount}/${total} solved</div><div class="pr-bar" style="margin-top:6px"><div class="pr-fill" style="width:${pct}%"></div></div></div>`
+      :`<div style="text-align:right;flex-shrink:0"><div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;color:var(--text2)"><svg style="width:14px;height:14px;stroke:currentColor;fill:none" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span style="font-size:13px;font-weight:700">${v.unlockCost?('✦ '+v.unlockCost):'Free'}</span></div><div style="font-size:11px;color:var(--text3);margin-top:4px">to unlock</div></div>`;
+    return `<div class="card card-click anim-in" style="animation-delay:${i*.05}s${v.unlocked?'':';opacity:.82'}" onclick="${clickFn}">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <div><div style="font-size:15px;font-weight:600;font-family:var(--font-d);color:var(--text);display:flex;align-items:center;gap:6px">${v.unlocked?'':'<svg style="width:13px;height:13px;stroke:currentColor;fill:none;flex-shrink:0" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'}${v.name}</div>
+          <div class="meta" style="margin-top:4px"><span class="badge ${v.colorTag}" style="font-size:11px">${v.subjectLabel}</span><span class="badge" style="font-size:11px">${v.difficulty}</span><span>${total} problems</span></div></div>
+        ${rightCol}
+      </div></div>`;
+  }).join('');
+  setTimeout(()=>rl(el),80);
+}
+function openPS(key){
+  const v=PROBLEM_SETS.find(s=>s.key===key);if(!v)return;
+  if(!v.unlocked){openUnlockModal(key);return;}
+  const el=document.getElementById('ps-content');
+  const solvedIdx=SOLVED_MAP[key]||[];
+  let html=`<div class="sec-hdr"><div><div class="sec-t">${v.name}</div><div class="sec-sub">${v.problems.length} problems · ${solvedIdx.length} solved</div></div><span class="badge ${v.colorTag}">${v.difficulty}</span></div>`;
+  v.problems.forEach((p,i)=>{
+    const solved=solvedIdx.includes(i);
+    const hasAnswer=p.answer&&p.answer.trim();
+    html+=`<div class="card" id="psprob-${key}-${i}"><div style="display:flex;align-items:flex-start;gap:10px;justify-content:space-between"><div style="flex:1"><div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:4px">PROBLEM ${i+1}</div><div class="latex-box" style="margin:0">${p.statement}</div></div>${solved?'<span class="badge grn" style="flex-shrink:0">Solved</span>':'<span class="badge" style="flex-shrink:0">Unsolved</span>'}</div>`;
+    if(solved&&hasAnswer){html+=`<div style="font-size:12px;color:var(--text3);margin-top:8px">Answer: <span style="color:var(--text2);font-weight:600">${p.answer}</span></div>`;}
+    else if(!solved&&currentUser&&!isGuest){
+      if(hasAnswer){
+        html+=`<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input class="inp" id="setans-${key}-${i}" placeholder="Your answer" style="margin-bottom:0;max-width:220px" onkeydown="if(event.key==='Enter')checkSetAnswer('${key}',${i})"><button class="btng" onclick="checkSetAnswer('${key}',${i})">Check answer</button><span id="setans-msg-${key}-${i}" style="font-size:12px"></span></div>`;
+      } else {
+        html+=`<div style="margin-top:10px"><button class="btng" onclick="checkSetAnswer('${key}',${i})">Mark as solved (self-reported — proof-style problem)</button></div>`;
+      }
+    } else if(!solved&&(isGuest||!currentUser)){
+      html+=`<div style="font-size:12px;color:var(--text3);margin-top:8px">Sign in to track your progress on this problem.</div>`;
+    }
+    html+=`</div>`;
+  });
+  el.innerHTML=html;
+  showPage('problemset');
+  setTimeout(()=>rl(el),80);
+}
+
+// COLLECTING / UNLOCKING SETS
+let unlockingKey=null;
+function openUnlockModal(key){
+  const v=PROBLEM_SETS.find(s=>s.key===key);if(!v)return;
+  if(!currentUser){alert('Sign in to collect problem sets.');return;}
+  if(v.unlocked){openPS(key);return;}
+  unlockingKey=key;
+  document.getElementById('unlock-modal-name').textContent=v.name;
+  document.getElementById('unlock-modal-meta').innerHTML=`<span class="badge ${v.colorTag}" style="font-size:11px">${v.subjectLabel}</span><span class="badge" style="font-size:11px">${v.difficulty}</span><span>${v.problemCount} problems</span>`;
+  document.getElementById('unlock-modal-cost').textContent='✦ '+v.unlockCost;
+  document.getElementById('unlock-modal-balance').textContent=`You have ✦ ${currentUser.reputation.toLocaleString()} reputation.`;
+  const err=document.getElementById('unlock-modal-err');err.style.display='none';
+  const btn=document.getElementById('unlock-modal-btn');
+  const canAfford=currentUser.reputation>=v.unlockCost;
+  btn.disabled=!canAfford;
+  btn.textContent=canAfford?'Unlock this set':'Not enough reputation';
+  document.getElementById('unlock-modal').classList.add('open');
+}
+async function confirmUnlock(){
+  if(!unlockingKey)return;
+  try{
+    const {user}=await api(`/sets/${unlockingKey}/unlock`,{method:'POST'});
+    currentUser.reputation=user.reputation;updateRepPill();renderProfileStats();
+    const v=PROBLEM_SETS.find(s=>s.key===unlockingKey);
+    closeModal('unlock-modal');
+    // Refresh sets from the API so the now-unlocked set's problems come through.
+    const {sets}=await api('/sets');
+    PROBLEM_SETS=sets;
+    renderPS();
+    openPS(unlockingKey);
+  }catch(e){
+    const err=document.getElementById('unlock-modal-err');
+    err.textContent=e.message;err.style.display='block';
+  }
+}
+
+async function checkSetAnswer(key,idx){
+  const inputEl=document.getElementById(`setans-${key}-${idx}`);
+  const answer=inputEl?inputEl.value.trim():'';
+  try{
+    const {correct}=await api(`/sets/${key}/${idx}/solve`,{method:'POST',body:JSON.stringify({answer})});
+    if(correct){
+      if(!SOLVED_MAP[key])SOLVED_MAP[key]=[];
+      if(!SOLVED_MAP[key].includes(idx))SOLVED_MAP[key].push(idx);
+      openPS(key);renderPS();renderProfileStats();
+    } else {
+      const msg=document.getElementById(`setans-msg-${key}-${idx}`);
+      if(msg){msg.textContent='Not quite — try again.';msg.style.color='var(--red-t)';}
+    }
+  }catch(e){ alert(e.message); }
+}
+
+// ============================================================================
+// PDF RESOURCES — admin-only add/remove, now genuinely permanent in the shared DB
+// ============================================================================
+function renderResourceCards(){
+  const el=document.getElementById('pdf-grid');if(!el)return;
+  if(RESOURCES.length===0){el.innerHTML='<div class="card" style="text-align:center;color:var(--text3);padding:24px;grid-column:1/-1">No PDF resources uploaded yet.</div>';}
+  else{
+    el.innerHTML=RESOURCES.map((r,i)=>`<div class="card card-click anim-in" style="padding:14px;animation-delay:${i*.05}s" onclick="openPdf('${r._id}')">
+      <div style="margin-bottom:10px;color:var(--text2)"><svg class="ic ic-lg" style="stroke:currentColor"><use href="#ic-doc"/></svg></div>
+      <div style="font-size:13px;font-weight:600;color:var(--text)">${r.title}</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">PDF · Uploaded by ${dispName(r.uploadedBy)}</div>
+      <div class="admin-only-btn" style="display:none;margin-top:8px">
+        <button class="btng" style="font-size:11px;padding:3px 8px;color:var(--red-t);border-color:var(--red-bd);width:100%;justify-content:center" onclick="event.stopPropagation();removePdf('${r._id}')">Remove</button>
+      </div>
+    </div>`).join('');
+  }
+  updateAdminUI();
+}
+function openPdf(id){
+  const r=RESOURCES.find(x=>x._id===id);if(!r)return;
+  if(r.url){window.open(r.url,'_blank');}
+  else if(r.dataBase64){const w=window.open();w.document.write(`<iframe src="${r.dataBase64}" style="border:none;width:100%;height:100vh"></iframe>`);}
+  else alert('No file attached to this entry — title/subject metadata only.');
+}
+async function removePdf(id){
+  if(!isAdmin)return;
+  if(!confirm('Remove this resource? This is permanent for every visitor.'))return;
+  try{
+    await api(`/resources/${id}`,{method:'DELETE'});
+    RESOURCES=RESOURCES.filter(r=>r._id!==id);
+    renderResourceCards();renderAdminResourcesTable();
+  }catch(e){ alert(e.message); }
+}
+function openUploadPdfModal(){
+  document.getElementById('upd-title').value='';document.getElementById('upd-file').value='';document.getElementById('upd-url').value='';
+  document.getElementById('upload-pdf-modal').classList.add('open');
+}
+async function submitUploadPdf(){
+  const title=document.getElementById('upd-title').value.trim();
+  if(!title){alert('Please enter a title.');return;}
+  const subject=document.getElementById('upd-subj').value;
+  const url=document.getElementById('upd-url').value.trim();
+  const fileInput=document.getElementById('upd-file');
+  const file=fileInput.files&&fileInput.files[0];
+  const finish=async (dataBase64)=>{
+    try{
+      const {resource}=await api('/resources',{method:'POST',body:JSON.stringify({title,subject,url:url||null,dataBase64:dataBase64||null})});
+      RESOURCES.unshift(resource);renderResourceCards();renderAdminResourcesTable();closeModal('upload-pdf-modal');
+    }catch(e){ alert(e.message); }
+  };
+  if(file){
+    if(file.size>8*1024*1024){alert('File is larger than 8MB. Use the link field instead — host it externally and paste the URL.');return;}
+    const reader=new FileReader();
+    reader.onload=()=>finish(reader.result);
+    reader.onerror=()=>{alert('Could not read file.');};
+    reader.readAsDataURL(file);
+  } else finish(null);
+}
+
+// ============================================================================
+// LEADERBOARD
+// ============================================================================
+function showLB(){
+  const lb=LEADERBOARD.slice();
+  const rankCls=['gold','silver','bronze'];
+  const top3=lb.slice(0,3);
+  const podiumOrder=[1,0,2]; // display order: 2nd, 1st, 3rd
+  const podiumHeights=[80,100,65];
+  const podiumIcons=['ic-trophy','ic-crown','ic-trophy'];
+  const podiumIconColor=['#9aa6b8','#d4a017','#b8784a'];
+  document.getElementById('lb-podium').innerHTML=podiumOrder.map((rank,slot)=>{
+    const p=top3[rank];if(!p)return '<div style="flex:1"></div>';
+    const me=currentUser&&p.username===currentUser.username;
+    return `<div style="text-align:center;flex:1">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:4px">${rank+1===1?'1st':rank+1===2?'2nd':'3rd'}</div>
+      <div style="background:var(--card);border:1.5px solid var(--border);border-radius:var(--r) var(--r) 0 0;padding:14px 8px;height:${podiumHeights[slot]}px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <svg style="width:${rank===0?28:22}px;height:${rank===0?28:22}px;stroke:${podiumIconColor[slot]};fill:none;margin-bottom:4px" viewBox="0 0 24 24" stroke-width="1.6"><use href="#${podiumIcons[slot]}"/></svg>
+        <div style="font-size:${rank===0?13:12}px;font-weight:${rank===0?700:600};color:var(--text)">${dispName(p.username)}${me?' (you)':''}</div>
+        <div style="font-size:${rank===0?12:11}px;color:${rank===0?'var(--accent)':'var(--text3)'};${rank===0?'font-weight:600':''}">✦ ${p.reputation.toLocaleString()}</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('lb-list').innerHTML=lb.map((p,i)=>{
+    const me=currentUser&&p.username===currentUser.username;
+    return `<div class="lb-row"><div class="lb-rank ${rankCls[i]||''}">${i+1}</div><div class="lb-av">${dispName(p.username).substring(0,2).toUpperCase()}</div><div style="flex:1;min-width:0"><div class="lb-name">${dispName(p.username)}${me?'<span class="badge grn" style="font-size:10px;margin-left:6px">You</span>':''}${p.isBot?'<span class="badge" style="font-size:10px;margin-left:6px">Bot</span>':''}</div><div style="font-size:11px;color:var(--text3)">${p.solved} solved</div></div><div class="lb-rep">✦ ${p.reputation.toLocaleString()}</div></div>`;
+  }).join('');
+  document.getElementById('lb-modal').classList.add('open');
+}
+
+// ============================================================================
+// ADMIN TABLES — driven by real data
+// ============================================================================
+function renderAdminUsersTable(){
+  const el=document.getElementById('adm-users-tbody');if(!el)return;
+  el.innerHTML=LEADERBOARD.map(p=>`<tr><td>${dispName(p.username)}${p.isBot?' <span class="badge" style="font-size:10px">Bot</span>':''}</td><td>✦ ${p.reputation.toLocaleString()}</td><td>${p.solved}</td><td><span class="badge grn">Active</span></td><td><button class="btng" style="font-size:11px;padding:3px 8px" disabled>View</button></td></tr>`).join('');
+}
+function renderAdminChallengesTable(){
+  const el=document.getElementById('adm-challenges-tbody');if(!el)return;
+  el.innerHTML=PROBLEMS.map(c=>{
+    const plain=c.title.replace(/\$\$?([^$]*)\$\$?/g,'$1').slice(0,50);
+    return `<tr><td>${plain}</td><td>${dispName(c.author)}</td><td><span class="badge ${c.status==='active'?'grn':'red'}">${c.status==='active'?'Active':'Closed'}</span></td><td>${c.solutions.length}</td><td><button class="btng" style="font-size:11px;padding:3px 8px;color:var(--red-t);border-color:var(--red-bd)" onclick="removeChallengeAdmin('${c._id}')">Remove</button></td></tr>`;
+  }).join('');
+}
+async function removeChallengeAdmin(id){
+  if(!isAdmin)return;
+  if(!confirm('Remove this challenge permanently for every visitor?'))return;
+  try{
+    await api(`/problems/${id}`,{method:'DELETE'});
+    PROBLEMS=PROBLEMS.filter(c=>c._id!==id);
+    renderAdminChallengesTable();renderChallenges();
+    if(currentOpenChallengeId===id)backArena();
+  }catch(e){ alert(e.message); }
+}
+function renderAdminResourcesTable(){
+  const el=document.getElementById('adm-resources-tbody');if(!el)return;
+  if(RESOURCES.length===0){el.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text3)">No resources yet.</td></tr>';return;}
+  el.innerHTML=RESOURCES.map(r=>`<tr><td>${r.title}</td><td>${r.subject}</td><td>${r.dataBase64?'File attached':r.url?'Linked':'Metadata only'}</td><td><button class="btng" style="font-size:11px;padding:3px 8px;color:var(--red-t);border-color:var(--red-bd)" onclick="removePdf('${r._id}')">Remove</button></td></tr>`).join('');
+}
+
+// GENERIC MODAL HELPERS
+function closeModal(id){const m=document.getElementById(id);if(m)m.classList.remove('open');}
+document.querySelectorAll('.modal-bg').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
+
+// ============================================================================
+// DUEL CREATION — 5-step modal, now backed by real search/solved-progress/forum data
+// ============================================================================
+let duelState={step:1,targetUsername:null,targetInfo:null,loadout:[null,null,null],pickingSlot:null,pickingSubjKey:null,forumProblemId:null};
+
 function openDuelChallenge(){
-  duelState={step:1,target:null,loadout:[null,null,null],forumP:null,origProb:'',origSol:'',pickingSlot:null};
+  if(!currentUser){alert('Sign in to challenge another player.');return;}
+  duelState={step:1,targetUsername:null,targetInfo:null,loadout:[null,null,null],pickingSlot:null,pickingSubjKey:null,forumProblemId:null};
   document.getElementById('player-search').value='';
   document.getElementById('player-results').innerHTML='';
   document.getElementById('selected-player').style.display='none';
@@ -1516,45 +1796,64 @@ function renderStepDots(){
   document.getElementById('step-dots').innerHTML=html;
 }
 function duelNext(n){
-  if(duelState.step===4){duelState.origProb=document.getElementById('orig-prob').value.trim();duelState.origSol=document.getElementById('orig-sol').value.trim();}
+  if(duelState.step===4){duelState.origText=document.getElementById('orig-prob').value.trim();duelState.origSol=document.getElementById('orig-sol').value.trim();}
   showDuelStep(n);
 }
 function duelBack(n){showDuelStep(n);}
+
+let searchDebounce=null;
 function searchPlayers(q){
+  clearTimeout(searchDebounce);
   const el=document.getElementById('player-results');
   if(!q){el.innerHTML='';return;}
-  const matches=PLAYERS.filter(p=>p.u.toLowerCase().includes(q.toLowerCase()));
-  el.innerHTML=matches.map(p=>`<div class="search-result-item" onclick="selectPlayer('${p.u}')"><div class="cav">${p.u.substring(0,2).toUpperCase()}</div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">${p.u}</div><div style="font-size:11px;color:var(--text3)">✦ ${p.cr.toLocaleString()} · ${p.duels} duels</div></div></div>`).join('')||'<div style="font-size:12px;color:var(--text3);padding:8px">No players found.</div>';
+  searchDebounce=setTimeout(async ()=>{
+    try{
+      const {players}=await api('/players/search?q='+encodeURIComponent(q));
+      const filtered=players.filter(p=>!currentUser||p.username!==currentUser.username);
+      el.innerHTML=filtered.map(p=>`<div class="search-result-item" onclick='selectPlayer(${JSON.stringify(p.username)})'><div class="cav">${dispName(p.username).substring(0,2).toUpperCase()}</div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">${dispName(p.username)}${p.isBot?' <span class="badge" style="font-size:10px">Bot</span>':''}</div><div style="font-size:11px;color:var(--text3)">✦ ${p.reputation.toLocaleString()}</div></div></div>`).join('')||'<div style="font-size:12px;color:var(--text3);padding:8px">No players found.</div>';
+    }catch(e){ el.innerHTML=`<div style="font-size:12px;color:var(--red-t);padding:8px">${e.message}</div>`; }
+  },250);
 }
-function selectPlayer(u){
-  const p=PLAYERS.find(x=>x.u===u);duelState.target=p;
-  document.getElementById('sp-name').textContent=p.u;
-  document.getElementById('sp-cr').textContent='✦ '+p.cr.toLocaleString();
-  document.getElementById('sp-d').textContent=p.duels;
-  document.getElementById('selected-player').style.display='block';
-  document.getElementById('player-results').innerHTML='';
-  document.getElementById('player-search').value=p.u;
-  document.getElementById('btn-step1').disabled=false;
+function selectPlayer(username){
+  api('/players/search?q='+encodeURIComponent(username)).then(({players})=>{
+    const p=players.find(x=>x.username===username)||{username,reputation:0,isBot:false};
+    duelState.targetUsername=p.username;duelState.targetInfo=p;
+    document.getElementById('sp-name').textContent=dispName(p.username);
+    document.getElementById('sp-cr').textContent='✦ '+p.reputation.toLocaleString();
+    document.getElementById('sp-d').textContent=p.isBot?'Bot — resolves instantly':'Human';
+    document.getElementById('selected-player').style.display='block';
+    document.getElementById('player-results').innerHTML='';
+    document.getElementById('player-search').value=dispName(p.username);
+    document.getElementById('btn-step1').disabled=false;
+  });
 }
 function renderSetPicker(){
   const el=document.getElementById('set-picker');
-  el.innerHTML=Object.entries(PS).map(([k,v])=>`<div class="ps-pick-item" onclick="pickSubject('${k}')"><strong>${v.s}</strong><div style="font-size:11px;color:var(--text3);margin-top:2px">${v.solved.length} solved</div></div>`).join('');
+  el.innerHTML=PROBLEM_SETS.map(v=>{
+    const solvedCount=(SOLVED_MAP[v.key]||[]).length;
+    return `<div class="ps-pick-item" onclick="pickSubject('${v.key}')"><strong>${v.subjectLabel}</strong><div style="font-size:11px;color:var(--text3);margin-top:2px">${solvedCount} solved</div></div>`;
+  }).join('');
   document.getElementById('prob-picker-wrap').style.display='none';
   updateLoadoutSlotsUI();
 }
 function pickProblem(slot){duelState.pickingSlot=slot;document.getElementById('prob-picker-wrap').style.display='none';}
 function pickSubject(key){
-  duelState.pickingSubj=key;const v=PS[key];
-  document.getElementById('prob-picker-title').textContent=v.s+' — solved problems';
+  duelState.pickingSubjKey=key;
+  const v=PROBLEM_SETS.find(s=>s.key===key);
+  const solvedIdx=SOLVED_MAP[key]||[];
+  document.getElementById('prob-picker-title').textContent=v.subjectLabel+' — solved problems';
   const wrap=document.getElementById('prob-picker-wrap');wrap.style.display='block';
   const el=document.getElementById('prob-picker');
-  if(v.solved.length===0){el.innerHTML='<div style="font-size:12px;color:var(--text3)">No solved problems in this set yet.</div>';return;}
-  el.innerHTML=v.solved.map(idx=>{const prob=v.probs[idx];const plain=prob.s.replace(/\$\$?([^$]*)\$\$?/g,'$1').slice(0,70);return `<div class="prob-pick-item" onclick="choosePsProblem('${key}',${idx})">${plain}</div>`;}).join('');
+  if(solvedIdx.length===0){el.innerHTML='<div style="font-size:12px;color:var(--text3)">No solved problems in this set yet — go solve some in the Resources tab first.</div>';return;}
+  el.innerHTML=solvedIdx.map(idx=>{
+    const plain=v.problems[idx].statement.replace(/\$\$?([^$]*)\$\$?/g,'$1').slice(0,70);
+    return `<div class="prob-pick-item" onclick="choosePsProblem('${key}',${idx})">${plain}</div>`;
+  }).join('');
 }
 function choosePsProblem(key,idx){
   if(duelState.pickingSlot==null){alert('Please click an empty slot first.');return;}
-  const v=PS[key];const txt=v.s+' #'+(idx+1);
-  duelState.loadout[duelState.pickingSlot-1]={key,idx,label:txt};
+  const v=PROBLEM_SETS.find(s=>s.key===key);
+  duelState.loadout[duelState.pickingSlot-1]={setKey:key,problemIndex:idx,label:`${v.subjectLabel} #${idx+1}`};
   updateLoadoutSlotsUI();
   document.getElementById('prob-picker-wrap').style.display='none';
   duelState.pickingSlot=null;
@@ -1571,34 +1870,216 @@ function updateLoadoutSlotsUI(){
 }
 function renderForumPicker(){
   const el=document.getElementById('forum-prob-list');
-  const eligible=CHALLENGES.filter(c=>c.sols.some(s=>s.u==='you'));
-  if(eligible.length===0){el.innerHTML='<div style="font-size:12px;color:var(--text3)">You have not submitted a forum solution yet.</div>';return;}
-  el.innerHTML=eligible.map(c=>{const plain=c.title.replace(/\$\$?([^$]*)\$\$?/g,'$1').slice(0,70);const sel=duelState.forumP===c.id?'selected':'';return `<div class="prob-pick-item ${sel}" onclick="chooseForumProblem(${c.id})">${plain}</div>`;}).join('');
+  if(!currentUser){el.innerHTML='';return;}
+  const eligible=PROBLEMS.filter(c=>c.solutions.some(s=>s.author===currentUser.username));
+  if(eligible.length===0){el.innerHTML='<div style="font-size:12px;color:var(--text3)">You have not submitted a forum solution yet — go answer one in the Arena first.</div>';return;}
+  el.innerHTML=eligible.map(c=>{
+    const plain=c.title.replace(/\$\$?([^$]*)\$\$?/g,'$1').slice(0,70);
+    const sel=duelState.forumProblemId===c._id?'selected':'';
+    return `<div class="prob-pick-item ${sel}" onclick="chooseForumProblem('${c._id}')">${plain}</div>`;
+  }).join('');
 }
-function chooseForumProblem(id){duelState.forumP=id;renderForumPicker();document.getElementById('btn-step3').disabled=false;}
+function chooseForumProblem(id){duelState.forumProblemId=id;renderForumPicker();document.getElementById('btn-step3').disabled=false;}
 function renderReview(){
   const el=document.getElementById('loadout-review');
   let html='<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">From problem sets</div>';
   duelState.loadout.forEach((item,i)=>{html+=`<div class="slot"><div class="slot-n">${i+1}</div><div style="flex:1;font-size:13px;color:var(--text)">${item?item.label:'—'}</div></div>`;});
   html+='<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin:12px 0 8px">Forum + Original</div>';
-  const forumC=CHALLENGES.find(c=>c.id===duelState.forumP);
+  const forumC=PROBLEMS.find(c=>c._id===duelState.forumProblemId);
   html+=`<div class="slot"><div class="slot-n">4</div><div style="flex:1;font-size:13px;color:var(--text)">${forumC?forumC.title.replace(/\$\$?([^$]*)\$\$?/g,'$1').slice(0,60):'—'}</div></div>`;
-  html+=`<div class="slot"><div class="slot-n">5</div><div style="flex:1;font-size:13px;color:var(--text)">${duelState.origProb?duelState.origProb.slice(0,60):'—'}</div></div>`;
+  html+=`<div class="slot"><div class="slot-n">5</div><div style="flex:1;font-size:13px;color:var(--text)">${duelState.origText?duelState.origText.slice(0,60):'—'}</div></div>`;
   el.innerHTML=html;setTimeout(()=>rl(el),50);
 }
-function sendDuelChallenge(){
-  if(!duelState.target){alert('Please select a player.');return;}
-  const name=duelState.target.u;closeModal('duel-modal');
-  alert(`Duel challenge sent to ${name}! They have 24 hours to accept.`);
+async function sendDuelChallenge(){
+  if(!duelState.targetUsername){alert('Please select a player.');return;}
+  if(!duelState.origText||!duelState.origSol){alert('Your original problem needs both a statement and a solution.');return;}
+  const loadout=[
+    ...duelState.loadout.map(item=>({type:'set',setKey:item.setKey,problemIndex:item.problemIndex})),
+    {type:'forum',problemId:duelState.forumProblemId},
+    {type:'original',text:duelState.origText,solutionText:duelState.origSol}
+  ];
+  try{
+    const {duel,autoResolved}=await api('/duels',{method:'POST',body:JSON.stringify({opponentUsername:duelState.targetUsername,loadout})});
+    closeModal('duel-modal');
+    MY_DUELS.unshift(duel);
+    renderDuelsPanel();
+    await refreshUser();
+    if(autoResolved){
+      const won=duel.winner===currentUser.username;
+      const correctCount=duel.loadout.filter(x=>x.correct).length;
+      alert(`${dispName(duel.opponent)} answered ${correctCount}/5 correctly.\n\n${won?'You won':'You lost'} ✦ ${duel.stakes} reputation.`);
+    } else {
+      alert(`Duel challenge sent to ${dispName(duel.opponent)}! They have to accept before it starts.`);
+    }
+  }catch(e){ alert(e.message); }
 }
 
-// GENERIC MODAL HELPERS
-function closeModal(id){const m=document.getElementById(id);if(m)m.classList.remove('open');}
-document.querySelectorAll('.modal-bg').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
+// ============================================================================
+// DIRECT DUELS PANEL — real states: pending invites, your turn to answer,
+// your turn to judge, waiting on the other player, and completed results.
+// ============================================================================
+function renderDuelsPanel(){
+  const el=document.getElementById('duels-list');if(!el)return;
+  if(!currentUser){
+    el.innerHTML=`<div class="card" style="text-align:center;padding:34px 20px"><div style="color:var(--text2);margin-bottom:10px"><svg class="ic ic-lg" style="stroke:currentColor"><use href="#ic-swords"/></svg></div><div style="font-size:14px;color:var(--text2)">Sign in to challenge other players to duels.</div></div>`;
+    return;
+  }
+  const me=currentUser.username;
+  const incoming=MY_DUELS.filter(d=>d.opponent===me&&d.status==='pending');
+  const outgoingPending=MY_DUELS.filter(d=>d.challenger===me&&d.status==='pending');
+  const yourTurnAnswer=MY_DUELS.filter(d=>d.opponent===me&&d.status==='in_progress'&&!d.answeredAt);
+  const awaitingAnswer=MY_DUELS.filter(d=>d.challenger===me&&d.status==='in_progress'&&!d.answeredAt);
+  const yourTurnJudge=MY_DUELS.filter(d=>d.challenger===me&&d.status==='in_progress'&&d.answeredAt&&d.loadout.some(x=>!x.graded));
+  const awaitingJudge=MY_DUELS.filter(d=>d.opponent===me&&d.status==='in_progress'&&d.answeredAt&&d.loadout.some(x=>!x.graded));
+  const completed=MY_DUELS.filter(d=>d.status==='completed').slice(0,6);
 
+  const sections=[];
+  if(incoming.length) sections.push(['Pending invites',incoming.map(d=>duelCardIncoming(d))]);
+  if(yourTurnAnswer.length) sections.push(['Your turn — answer',yourTurnAnswer.map(d=>duelCardAnswer(d))]);
+  if(yourTurnJudge.length) sections.push(['Your turn — judge',yourTurnJudge.map(d=>duelCardJudge(d))]);
+  if(outgoingPending.length) sections.push(['Waiting for response',outgoingPending.map(d=>duelCardWaiting(d,'Waiting for '+dispName(d.opponent)+' to accept'))]);
+  if(awaitingAnswer.length) sections.push(['Waiting for answers',awaitingAnswer.map(d=>duelCardWaiting(d,'Waiting for '+dispName(d.opponent)+' to answer'))]);
+  if(awaitingJudge.length) sections.push(['Awaiting judging',awaitingJudge.map(d=>duelCardWaiting(d,'Waiting for '+dispName(d.challenger)+' to judge your answers'))]);
+  if(completed.length) sections.push(['Recent results',completed.map(d=>duelCardCompleted(d))]);
+
+  if(sections.length===0){
+    el.innerHTML=`<div class="card" style="text-align:center;padding:34px 20px">
+      <div style="color:var(--text2);margin-bottom:10px"><svg class="ic ic-lg" style="stroke:currentColor"><use href="#ic-swords"/></svg></div>
+      <div style="font-size:14px;color:var(--text2);margin-bottom:14px">You don't have any active duels yet.</div>
+      <button class="btn" onclick="openDuelChallenge()">Challenge a player →</button>
+    </div>`;
+    return;
+  }
+  el.innerHTML=sections.map(([title,cards])=>`<div class="sec-sub" style="margin:14px 0 8px;font-weight:600;color:var(--text2)">${title}</div>${cards.join('')}`).join('');
+}
+function duelGridHtml(d){
+  return `<div class="duel-grid" style="margin-bottom:10px">
+    <div class="player-card"><div class="player-av"><svg class="ic" style="stroke:currentColor"><use href="#ic-user"/></svg></div><div style="font-size:13px;font-weight:600;color:var(--text)">${dispName(d.challenger)}</div></div>
+    <div style="font-size:22px;font-weight:700;color:var(--text3);text-align:center">VS</div>
+    <div class="player-card"><div class="player-av"><svg class="ic" style="stroke:currentColor"><use href="#ic-user"/></svg></div><div style="font-size:13px;font-weight:600;color:var(--text)">${dispName(d.opponent)}</div></div>
+  </div>`;
+}
+function duelCardIncoming(d){
+  return `<div class="card anim-in">
+    <div class="badge ora" style="margin-bottom:10px"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-mail"/></svg> Challenge from ${dispName(d.challenger)}</div>
+    ${duelGridHtml(d)}
+    <div style="text-align:center;font-size:13px;color:var(--text2);margin-bottom:12px">Stakes: <strong style="color:var(--text)">✦ ${d.stakes} reputation</strong></div>
+    <div style="display:flex;gap:8px;justify-content:center"><button class="btn" onclick="respondDuel('${d._id}','accept')">Accept</button><button class="btng" onclick="respondDuel('${d._id}','decline')">Decline</button></div>
+  </div>`;
+}
+function duelCardAnswer(d){
+  return `<div class="card anim-in">
+    <div class="badge blu" style="margin-bottom:10px"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-swords"/></svg> Your turn to answer</div>
+    ${duelGridHtml(d)}
+    <div style="text-align:center;font-size:13px;color:var(--text2);margin-bottom:12px">Stakes: <strong style="color:var(--text)">✦ ${d.stakes} reputation</strong></div>
+    <div style="text-align:center"><button class="btn" onclick="openDuelAnswerModal('${d._id}')">Answer the 5 problems</button></div>
+  </div>`;
+}
+function duelCardJudge(d){
+  const ungraded=d.loadout.filter(x=>!x.graded).length;
+  return `<div class="card anim-in">
+    <div class="badge ora" style="margin-bottom:10px"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-flag"/></svg> Your turn to judge (${ungraded} left)</div>
+    ${duelGridHtml(d)}
+    <div style="text-align:center;font-size:13px;color:var(--text2);margin-bottom:12px">Stakes: <strong style="color:var(--text)">✦ ${d.stakes} reputation</strong></div>
+    <div style="text-align:center"><button class="btn" onclick="openDuelJudgeModal('${d._id}')">Review answers</button></div>
+  </div>`;
+}
+function duelCardWaiting(d,label){
+  return `<div class="card anim-in">
+    <div class="badge" style="margin-bottom:10px"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-timer"/></svg> ${label}</div>
+    ${duelGridHtml(d)}
+    <div style="text-align:center;font-size:13px;color:var(--text2)">Stakes: <strong style="color:var(--text)">✦ ${d.stakes} reputation</strong></div>
+  </div>`;
+}
+function duelCardCompleted(d){
+  const won=d.winner===currentUser.username;
+  const opp=d.challenger===currentUser.username?d.opponent:d.challenger;
+  return `<div class="card anim-in" style="border-color:${won?'var(--grn-bd)':'var(--red-bd)'}">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
+      <div class="badge ${won?'grn':'red'}"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#${won?'ic-check':'ic-x'}"/></svg> ${won?'Victory':'Defeat'}</div>
+    </div>
+    <div style="font-size:14px;color:var(--text2)">vs <strong>${dispName(opp)}</strong> — <span style="color:${won?'var(--grn-t)':'var(--red-t)'};font-weight:600">${won?'+':'-'}✦ ${d.stakes} reputation</span></div>
+  </div>`;
+}
+async function respondDuel(id,action){
+  try{
+    const {duel}=await api(`/duels/${id}/respond`,{method:'POST',body:JSON.stringify({action})});
+    const i=MY_DUELS.findIndex(d=>d._id===id);if(i>=0)MY_DUELS[i]=duel;
+    renderDuelsPanel();
+  }catch(e){ alert(e.message); }
+}
+
+// DUEL ANSWER MODAL
+let answeringDuelId=null;
+function openDuelAnswerModal(id){
+  const d=MY_DUELS.find(x=>x._id===id);if(!d)return;
+  answeringDuelId=id;
+  document.getElementById('duel-answer-stakes').textContent=`vs ${dispName(d.challenger)} · Stakes: ✦ ${d.stakes} reputation`;
+  const el=document.getElementById('duel-answer-list');
+  el.innerHTML=d.loadout.map((item,i)=>{
+    const checkable=item.type==='set'&&item.referenceAnswer;
+    return `<div class="card" style="margin-bottom:10px"><div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:6px">PROBLEM ${i+1} ${item.type==='set'?'(from their solved sets)':item.type==='forum'?'(forum problem)':'(original problem)'}</div><div class="latex-box" style="margin:0 0 8px">${item.statement}</div>${checkable?`<input class="inp" id="duel-ans-${i}" placeholder="Your answer">`:`<textarea class="inp" id="duel-ans-${i}" placeholder="Your solution..." style="min-height:70px"></textarea>`}</div>`;
+  }).join('');
+  document.getElementById('duel-answer-modal').classList.add('open');
+  setTimeout(()=>rl(el),80);
+}
+async function submitDuelAnswers(){
+  const d=MY_DUELS.find(x=>x._id===answeringDuelId);if(!d)return;
+  const answers=d.loadout.map((item,i)=>({slot:i,text:document.getElementById('duel-ans-'+i).value.trim()}));
+  if(answers.some(a=>!a.text)){if(!confirm('Some answers are blank — submit anyway?'))return;}
+  try{
+    const {duel}=await api(`/duels/${answeringDuelId}/answers`,{method:'POST',body:JSON.stringify({answers})});
+    const i=MY_DUELS.findIndex(x=>x._id===answeringDuelId);if(i>=0)MY_DUELS[i]=duel;
+    closeModal('duel-answer-modal');renderDuelsPanel();
+  }catch(e){ alert(e.message); }
+}
+
+// DUEL JUDGE MODAL
+let judgingDuelId=null;
+function openDuelJudgeModal(id){
+  const d=MY_DUELS.find(x=>x._id===id);if(!d)return;
+  judgingDuelId=id;
+  renderJudgeModalContent(d);
+  document.getElementById('duel-judge-modal').classList.add('open');
+}
+function renderJudgeModalContent(d){
+  const el=document.getElementById('duel-judge-list');
+  const ungraded=d.loadout.map((item,i)=>({item,i})).filter(x=>!x.item.graded);
+  if(ungraded.length===0){
+    el.innerHTML=`<div class="card" style="text-align:center;color:var(--grn-t);padding:20px">All graded — duel complete!</div>`;
+    return;
+  }
+  el.innerHTML=ungraded.map(({item,i})=>`<div class="card" style="margin-bottom:10px">
+    <div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:6px">PROBLEM ${i+1}</div>
+    <div class="latex-box" style="margin:0 0 8px">${item.statement}</div>
+    <div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:4px">${dispName(MY_DUELS.find(x=>x._id===judgingDuelId).opponent)}'s answer:</div>
+    <div class="latex-box" style="margin:0 0 8px;background:var(--blu-bg);border-color:var(--blu-bd)">${item.opponentAnswer||'(blank)'}</div>
+    <div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:4px">Reference (your own solution):</div>
+    <div class="latex-box" style="margin:0 0 10px;background:var(--grn-bg);border-color:var(--grn-bd)">${item.referenceAnswer}</div>
+    <div style="display:flex;gap:8px"><button class="btn" style="background:var(--grn-t);border-color:var(--grn-t)" onclick="judgeSlot(${i},true)">Correct</button><button class="btn" style="background:var(--red-t);border-color:var(--red-t)" onclick="judgeSlot(${i},false)">Incorrect</button></div>
+  </div>`).join('');
+  setTimeout(()=>rl(el),80);
+}
+async function judgeSlot(slot,correct){
+  try{
+    const {duel}=await api(`/duels/${judgingDuelId}/judge`,{method:'POST',body:JSON.stringify({slot,correct})});
+    const i=MY_DUELS.findIndex(x=>x._id===judgingDuelId);if(i>=0)MY_DUELS[i]=duel;
+    if(duel.status==='completed'){
+      closeModal('duel-judge-modal');renderDuelsPanel();await refreshUser();
+      const won=duel.winner===currentUser.username;
+      alert(`Duel complete! ${won?'You won':'You lost'} ✦ ${duel.stakes} reputation.`);
+    } else {
+      renderJudgeModalContent(duel);renderDuelsPanel();
+    }
+  }catch(e){ alert(e.message); }
+}
+
+// ============================================================================
 // INIT
-window.addEventListener('DOMContentLoaded',()=>{
-  animStat('st1',127);animStat('st2',43);animStat('st3',Object.keys(PS).length);
+// ============================================================================
+window.addEventListener('DOMContentLoaded',async ()=>{
+  const restored=await tryAutoLogin();
+  if(!restored){ animStat('st1',0);animStat('st2',0);animStat('st3',0); }
 });
 </script>
 </body>
