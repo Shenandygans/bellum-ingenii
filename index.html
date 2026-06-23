@@ -446,6 +446,9 @@ body.hp .res-callout{background:rgba(192,160,56,0.1);color:#e0cda0;border:1.5px 
   <symbol id="ic-crown" viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
     <path d="M3 18h18"/><path d="M3 18l3-10 6 5 6-5 3 10H3z"/>
   </symbol>
+  <symbol id="ic-bell" viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+  </symbol>
 </svg>
 
 <canvas id="hp-canvas" class="z1"></canvas>
@@ -641,6 +644,13 @@ body.hp .res-callout{background:rgba(192,160,56,0.1);color:#e0cda0;border:1.5px 
         <button class="t-btn" onclick="setTheme('hp',this)">HP</button>
         <button class="t-btn" onclick="setTheme('owl',this)">Owl</button>
       </div>
+      <div class="ddwrap">
+        <button class="btng" style="font-size:12px;padding:6px 10px;position:relative" onclick="toggleNotifDropdown()">
+          <svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-bell"/></svg>
+          <span id="notif-badge" style="display:none;position:absolute;top:1px;right:1px;background:var(--red-t);color:#fff;border-radius:10px;min-width:15px;height:15px;font-size:9.5px;font-weight:700;align-items:center;justify-content:center;padding:0 3px;line-height:15px;text-align:center">0</span>
+        </button>
+        <div class="ddmenu" id="notif-dropdown" style="right:0;left:auto;min-width:300px;max-width:340px;max-height:420px;overflow-y:auto"></div>
+      </div>
       <button class="btng" style="font-size:12px;padding:6px 10px" onclick="openSettings()">
         <svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-gear"/></svg>
       </button>
@@ -716,13 +726,13 @@ body.hp .res-callout{background:rgba(192,160,56,0.1);color:#e0cda0;border:1.5px 
                   <div class="ddi-ic"><svg class="ic" style="stroke:currentColor"><use href="#ic-swords"/></svg></div>
                   <div><div class="ddi-lbl">Challenge a player</div><div class="ddi-desc">Send a 1v1 duel request</div></div>
                 </div>
-                <div class="ddi" onclick="closeDD();alert('W: 0 · L: 0 · Streak: 0\\n\\nYou have not completed any duels yet.')">
+                <div class="ddi" onclick="closeDD();showDuelHistorySummary()">
                   <div class="ddi-ic"><svg class="ic" style="stroke:currentColor"><use href="#ic-history"/></svg></div>
-                  <div><div class="ddi-lbl">Duel history</div><div class="ddi-desc">W: 0 · L: 0 · Streak: 0</div></div>
+                  <div><div class="ddi-lbl">Duel history</div><div class="ddi-desc" id="duel-history-desc">W: 0 · L: 0 · D: 0</div></div>
                 </div>
-                <div class="ddi" onclick="closeDD();alert('No incoming challenges right now.')">
+                <div class="ddi" onclick="closeDD();showPendingInvitesSummary()">
                   <div class="ddi-ic"><svg class="ic" style="stroke:currentColor"><use href="#ic-mail"/></svg></div>
-                  <div><div class="ddi-lbl">Pending invites</div><div class="ddi-desc">No incoming challenges</div></div>
+                  <div><div class="ddi-lbl">Pending invites</div><div class="ddi-desc" id="pending-invites-desc">No incoming challenges</div></div>
                 </div>
                 <div class="ddi" onclick="closeDD();showPage('resources')">
                   <div class="ddi-ic"><svg class="ic" style="stroke:currentColor"><use href="#ic-arsenal"/></svg></div>
@@ -930,8 +940,8 @@ body.hp .res-callout{background:rgba(192,160,56,0.1);color:#e0cda0;border:1.5px 
     <div class="duel-step" id="dstep-5">
       <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px">Review your loadout</div>
       <div id="loadout-review" style="margin-bottom:16px"></div>
-      <div style="background:var(--ora-bg);border:1.5px solid var(--ora-bd);border-radius:var(--r);padding:12px 14px;font-size:13px;color:var(--ora-t);margin-bottom:16px">
-        Stakes: If you lose, you pay <strong>10% of your current reputation (✦ 124)</strong> to your opponent. If you win, you receive 10% of theirs.
+      <div style="background:var(--ora-bg);border:1.5px solid var(--ora-bd);border-radius:var(--r);padding:12px 14px;font-size:13px;color:var(--ora-t);margin-bottom:16px" id="duel-stakes-preview">
+        Stakes: if you lose, you pay your opponent reputation; if you win, you take theirs.
       </div>
       <div style="margin-top:8px;display:flex;justify-content:space-between">
         <button class="btng" onclick="duelBack(4)">← Back</button>
@@ -1040,7 +1050,7 @@ body.hp .res-callout{background:rgba(192,160,56,0.1);color:#e0cda0;border:1.5px 
 // ============================================================================
 // CONFIG — point this at your deployed backend (see backend README for setup)
 // ============================================================================
-const API_BASE = 'https://bellum-ingenii-backend.onrender.com/api'; // <-- EDIT THIS after deploying the backend
+const API_BASE = 'https://YOUR-BACKEND.onrender.com/api'; // <-- EDIT THIS after deploying the backend
 
 const BOT_DISPLAY = { eulerbot:'EulerBot', gaussbot:'GaussBot', noetherbot:'NoetherBot', ramanujanbot:'RamanujanBot', turingbot:'TuringBot' };
 function dispName(u){ return BOT_DISPLAY[u] || u; }
@@ -1336,13 +1346,14 @@ async function enterApp(){
   initOwlCanvas();updateAdminUI();
   showPage('arena');
   await loadAppData();
+  if(currentUser)startNotifPolling();
 }
 
 function doLogout(){
   setToken(null);currentUser=null;isGuest=false;isAdmin=false;document.body.classList.remove('admin-on');
   document.getElementById('app').style.display='none';document.getElementById('landing').style.display='block';
   document.getElementById('g-ind').style.display='none';currentOpenChallengeId=null;
-  stopMap();stopBgOwls();stopHPP();
+  stopMap();stopBgOwls();stopHPP();stopNotifPolling();
   ['sec-auth','sec-signup'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none';});
 }
 function logoutAdmin(){isAdmin=false;document.body.classList.remove('admin-on');updateAdminUI();}
@@ -1766,19 +1777,32 @@ function closeModal(id){const m=document.getElementById(id);if(m)m.classList.rem
 document.querySelectorAll('.modal-bg').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
 
 // ============================================================================
-// DUEL CREATION — 5-step modal, now backed by real search/solved-progress/forum data
+// DUEL CREATION / RESPONSE — mutual exchange: both sides submit their own 5
+// problems, both answer the OTHER's, whoever solves more of the other's
+// problems wins. The same 5-step picker UI is reused for both the initial
+// challenge (mode 'create') and the opponent building their own loadout
+// (mode 'respond') — only the opponent-selection step differs.
 // ============================================================================
-let duelState={step:1,targetUsername:null,targetInfo:null,loadout:[null,null,null],pickingSlot:null,pickingSubjKey:null,forumProblemId:null};
+let duelState={mode:'create',duelId:null,step:1,targetUsername:null,targetInfo:null,loadout:[null,null,null],pickingSlot:null,pickingSubjKey:null,forumProblemId:null,origText:'',origSol:''};
 
 function openDuelChallenge(){
   if(!currentUser){alert('Sign in to challenge another player.');return;}
-  duelState={step:1,targetUsername:null,targetInfo:null,loadout:[null,null,null],pickingSlot:null,pickingSubjKey:null,forumProblemId:null};
+  duelState={mode:'create',duelId:null,step:1,targetUsername:null,targetInfo:null,loadout:[null,null,null],pickingSlot:null,pickingSubjKey:null,forumProblemId:null,origText:'',origSol:''};
+  document.getElementById('duel-modal-t').innerHTML='<svg class="ic" style="stroke:currentColor"><use href="#ic-swords"/></svg> Challenge a Player';
   document.getElementById('player-search').value='';
   document.getElementById('player-results').innerHTML='';
   document.getElementById('selected-player').style.display='none';
   document.getElementById('btn-step1').disabled=true;
   document.getElementById('orig-prob').value='';document.getElementById('orig-sol').value='';
   showDuelStep(1);
+  document.getElementById('duel-modal').classList.add('open');
+}
+function openOpponentLoadoutModal(duelId){
+  const d=MY_DUELS.find(x=>x._id===duelId);if(!d)return;
+  duelState={mode:'respond',duelId,step:2,targetUsername:d.challenger,targetInfo:null,loadout:[null,null,null],pickingSlot:null,pickingSubjKey:null,forumProblemId:null,origText:'',origSol:''};
+  document.getElementById('duel-modal-t').innerHTML=`<svg class="ic" style="stroke:currentColor"><use href="#ic-swords"/></svg> Send your 5 problems to ${dispName(d.challenger)}`;
+  document.getElementById('orig-prob').value='';document.getElementById('orig-sol').value='';
+  showDuelStep(2);
   document.getElementById('duel-modal').classList.add('open');
 }
 function showDuelStep(n){
@@ -1792,15 +1816,22 @@ function showDuelStep(n){
 }
 function renderStepDots(){
   let html='';
-  for(let i=1;i<=5;i++){let cls='step-dot';if(i<duelState.step)cls+=' done';if(i===duelState.step)cls+=' active';html+=`<div class="${cls}"></div>`;}
+  for(let i=1;i<=5;i++){
+    let cls='step-dot';
+    if((duelState.mode==='respond'&&i===1)||i<duelState.step)cls+=' done';
+    if(i===duelState.step)cls+=' active';
+    html+=`<div class="${cls}"></div>`;
+  }
   document.getElementById('step-dots').innerHTML=html;
 }
 function duelNext(n){
   if(duelState.step===4){duelState.origText=document.getElementById('orig-prob').value.trim();duelState.origSol=document.getElementById('orig-sol').value.trim();}
   showDuelStep(n);
 }
-function duelBack(n){showDuelStep(n);}
-
+function duelBack(n){
+  if(n===1&&duelState.mode==='respond'){closeModal('duel-modal');return;}
+  showDuelStep(n);
+}
 let searchDebounce=null;
 function searchPlayers(q){
   clearTimeout(searchDebounce);
@@ -1829,7 +1860,7 @@ function selectPlayer(username){
 }
 function renderSetPicker(){
   const el=document.getElementById('set-picker');
-  el.innerHTML=PROBLEM_SETS.map(v=>{
+  el.innerHTML=PROBLEM_SETS.filter(v=>v.unlocked).map(v=>{
     const solvedCount=(SOLVED_MAP[v.key]||[]).length;
     return `<div class="ps-pick-item" onclick="pickSubject('${v.key}')"><strong>${v.subjectLabel}</strong><div style="font-size:11px;color:var(--text3);margin-top:2px">${solvedCount} solved</div></div>`;
   }).join('');
@@ -1889,8 +1920,17 @@ function renderReview(){
   html+=`<div class="slot"><div class="slot-n">4</div><div style="flex:1;font-size:13px;color:var(--text)">${forumC?forumC.title.replace(/\$\$?([^$]*)\$\$?/g,'$1').slice(0,60):'—'}</div></div>`;
   html+=`<div class="slot"><div class="slot-n">5</div><div style="flex:1;font-size:13px;color:var(--text)">${duelState.origText?duelState.origText.slice(0,60):'—'}</div></div>`;
   el.innerHTML=html;setTimeout(()=>rl(el),50);
+
+  const stakesEl=document.getElementById('duel-stakes-preview');
+  if(duelState.mode==='create'){
+    const stakes=currentUser?Math.max(1,Math.round(currentUser.reputation*0.1)):0;
+    stakesEl.innerHTML=`Stakes: ✦ ${stakes} reputation (10% of your current balance). ${dispName(duelState.targetUsername)} will send back 5 problems of their own — whoever solves more of the <em>other</em> person's problems wins.`;
+  } else {
+    stakesEl.innerHTML=`These are <strong>your</strong> 5 problems — ${dispName(duelState.targetUsername)} will answer them and you'll judge how they did. Meanwhile you'll answer their 5 too. Higher score wins.`;
+  }
 }
 async function sendDuelChallenge(){
+  if(duelState.mode==='respond')return submitOpponentLoadoutNow();
   if(!duelState.targetUsername){alert('Please select a player.');return;}
   if(!duelState.origText||!duelState.origSol){alert('Your original problem needs both a statement and a solution.');return;}
   const loadout=[
@@ -1899,27 +1939,47 @@ async function sendDuelChallenge(){
     {type:'original',text:duelState.origText,solutionText:duelState.origSol}
   ];
   try{
-    const {duel,autoResolved}=await api('/duels',{method:'POST',body:JSON.stringify({opponentUsername:duelState.targetUsername,loadout})});
+    const {duel,botInstant}=await api('/duels',{method:'POST',body:JSON.stringify({opponentUsername:duelState.targetUsername,loadout})});
     closeModal('duel-modal');
     MY_DUELS.unshift(duel);
     renderDuelsPanel();
-    await refreshUser();
-    if(autoResolved){
-      const won=duel.winner===currentUser.username;
-      const correctCount=duel.loadout.filter(x=>x.correct).length;
-      alert(`${dispName(duel.opponent)} answered ${correctCount}/5 correctly.\n\n${won?'You won':'You lost'} ✦ ${duel.stakes} reputation.`);
+    if(botInstant){
+      alert(`${dispName(duel.opponent)} accepted instantly and already answered your 5 problems! Now answer their 5 to see who wins.`);
+      openDuelAnswerModal(duel._id);
     } else {
-      alert(`Duel challenge sent to ${dispName(duel.opponent)}! They have to accept before it starts.`);
+      alert(`Duel challenge sent to ${dispName(duel.opponent)}! They'll need to accept and send their own 5 problems back.`);
     }
+  }catch(e){ alert(e.message); }
+}
+async function submitOpponentLoadoutNow(){
+  if(!duelState.origText||!duelState.origSol){alert('Your original problem needs both a statement and a solution.');return;}
+  const loadout=[
+    ...duelState.loadout.map(item=>({type:'set',setKey:item.setKey,problemIndex:item.problemIndex})),
+    {type:'forum',problemId:duelState.forumProblemId},
+    {type:'original',text:duelState.origText,solutionText:duelState.origSol}
+  ];
+  try{
+    const {duel}=await api(`/duels/${duelState.duelId}/opponent-loadout`,{method:'POST',body:JSON.stringify({loadout})});
+    const i=MY_DUELS.findIndex(d=>d._id===duel._id);if(i>=0)MY_DUELS[i]=duel;
+    closeModal('duel-modal');
+    renderDuelsPanel();
+    alert(`Your 5 problems are on their way to ${dispName(duel.challenger)}!`);
   }catch(e){ alert(e.message); }
 }
 
 // ============================================================================
-// DIRECT DUELS PANEL — real states: pending invites, your turn to answer,
-// your turn to judge, waiting on the other player, and completed results.
+// DIRECT DUELS PANEL — real, mutual states: invites, building your loadout,
+// answering, judging, waiting on the other side, and completed results.
 // ============================================================================
+function myAnsweredAt(d,me){ return me===d.challenger ? d.challengerAnsweredAt : d.opponentAnsweredAt; }
+function otherAnsweredAt(d,me){ return me===d.challenger ? d.opponentAnsweredAt : d.challengerAnsweredAt; }
+function myOwnLoadout(d,me){ return (me===d.challenger ? d.challengerLoadout : d.opponentLoadout) || []; } // problems I authored
+function otherLoadout(d,me){ return (me===d.challenger ? d.opponentLoadout : d.challengerLoadout) || []; } // problems I must answer
+function myOwnLoadoutNeedsJudging(d,me){ const lo=myOwnLoadout(d,me); return lo.length>0 && lo.some(x=>!x.graded) && !!otherAnsweredAt(d,me); }
+
 function renderDuelsPanel(){
   const el=document.getElementById('duels-list');if(!el)return;
+  updateDuelSummaryDescs();
   if(!currentUser){
     el.innerHTML=`<div class="card" style="text-align:center;padding:34px 20px"><div style="color:var(--text2);margin-bottom:10px"><svg class="ic ic-lg" style="stroke:currentColor"><use href="#ic-swords"/></svg></div><div style="font-size:14px;color:var(--text2)">Sign in to challenge other players to duels.</div></div>`;
     return;
@@ -1927,20 +1987,23 @@ function renderDuelsPanel(){
   const me=currentUser.username;
   const incoming=MY_DUELS.filter(d=>d.opponent===me&&d.status==='pending');
   const outgoingPending=MY_DUELS.filter(d=>d.challenger===me&&d.status==='pending');
-  const yourTurnAnswer=MY_DUELS.filter(d=>d.opponent===me&&d.status==='in_progress'&&!d.answeredAt);
-  const awaitingAnswer=MY_DUELS.filter(d=>d.challenger===me&&d.status==='in_progress'&&!d.answeredAt);
-  const yourTurnJudge=MY_DUELS.filter(d=>d.challenger===me&&d.status==='in_progress'&&d.answeredAt&&d.loadout.some(x=>!x.graded));
-  const awaitingJudge=MY_DUELS.filter(d=>d.opponent===me&&d.status==='in_progress'&&d.answeredAt&&d.loadout.some(x=>!x.graded));
-  const completed=MY_DUELS.filter(d=>d.status==='completed').slice(0,6);
+  const needYourLoadout=MY_DUELS.filter(d=>d.opponent===me&&d.status==='awaiting_opponent_loadout');
+  const waitingTheirLoadout=MY_DUELS.filter(d=>d.challenger===me&&d.status==='awaiting_opponent_loadout');
+  const inProgress=MY_DUELS.filter(d=>d.status==='in_progress');
+  const yourTurnAnswer=inProgress.filter(d=>!myAnsweredAt(d,me));
+  const yourTurnJudge=inProgress.filter(d=>myOwnLoadoutNeedsJudging(d,me));
+  const waitingOnThem=inProgress.filter(d=>!yourTurnAnswer.includes(d)&&!yourTurnJudge.includes(d));
+  const completed=MY_DUELS.filter(d=>d.status==='completed').slice(0,8);
 
   const sections=[];
   if(incoming.length) sections.push(['Pending invites',incoming.map(d=>duelCardIncoming(d))]);
-  if(yourTurnAnswer.length) sections.push(['Your turn — answer',yourTurnAnswer.map(d=>duelCardAnswer(d))]);
-  if(yourTurnJudge.length) sections.push(['Your turn — judge',yourTurnJudge.map(d=>duelCardJudge(d))]);
+  if(needYourLoadout.length) sections.push(['Build your loadout',needYourLoadout.map(d=>duelCardBuildLoadout(d))]);
+  if(yourTurnAnswer.length) sections.push(['Your turn — answer',yourTurnAnswer.map(d=>duelCardAnswer(d,me))]);
+  if(yourTurnJudge.length) sections.push(['Your turn — judge',yourTurnJudge.map(d=>duelCardJudge(d,me))]);
   if(outgoingPending.length) sections.push(['Waiting for response',outgoingPending.map(d=>duelCardWaiting(d,'Waiting for '+dispName(d.opponent)+' to accept'))]);
-  if(awaitingAnswer.length) sections.push(['Waiting for answers',awaitingAnswer.map(d=>duelCardWaiting(d,'Waiting for '+dispName(d.opponent)+' to answer'))]);
-  if(awaitingJudge.length) sections.push(['Awaiting judging',awaitingJudge.map(d=>duelCardWaiting(d,'Waiting for '+dispName(d.challenger)+' to judge your answers'))]);
-  if(completed.length) sections.push(['Recent results',completed.map(d=>duelCardCompleted(d))]);
+  if(waitingTheirLoadout.length) sections.push(['Waiting for their problems',waitingTheirLoadout.map(d=>duelCardWaiting(d,'Waiting for '+dispName(d.opponent)+' to send their 5 problems'))]);
+  if(waitingOnThem.length) sections.push(['Waiting on opponent',waitingOnThem.map(d=>duelCardWaiting(d,'Waiting on '+dispName(d.challenger===me?d.opponent:d.challenger)))]);
+  if(completed.length) sections.push(['Recent results',completed.map(d=>duelCardCompleted(d,me))]);
 
   if(sections.length===0){
     el.innerHTML=`<div class="card" style="text-align:center;padding:34px 20px">
@@ -1967,18 +2030,29 @@ function duelCardIncoming(d){
     <div style="display:flex;gap:8px;justify-content:center"><button class="btn" onclick="respondDuel('${d._id}','accept')">Accept</button><button class="btng" onclick="respondDuel('${d._id}','decline')">Decline</button></div>
   </div>`;
 }
-function duelCardAnswer(d){
+function duelCardBuildLoadout(d){
   return `<div class="card anim-in">
-    <div class="badge blu" style="margin-bottom:10px"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-swords"/></svg> Your turn to answer</div>
+    <div class="badge blu" style="margin-bottom:10px"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-post"/></svg> Send your 5 problems</div>
+    ${duelGridHtml(d)}
+    <div style="text-align:center;font-size:13px;color:var(--text2);margin-bottom:12px">Stakes: <strong style="color:var(--text)">✦ ${d.stakes} reputation</strong></div>
+    <div style="text-align:center"><button class="btn" onclick="openOpponentLoadoutModal('${d._id}')">Build my loadout</button></div>
+  </div>`;
+}
+function duelCardAnswer(d,me){
+  const author=me===d.challenger?d.opponent:d.challenger;
+  return `<div class="card anim-in">
+    <div class="badge blu" style="margin-bottom:10px"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-swords"/></svg> Your turn — answer ${dispName(author)}'s problems</div>
     ${duelGridHtml(d)}
     <div style="text-align:center;font-size:13px;color:var(--text2);margin-bottom:12px">Stakes: <strong style="color:var(--text)">✦ ${d.stakes} reputation</strong></div>
     <div style="text-align:center"><button class="btn" onclick="openDuelAnswerModal('${d._id}')">Answer the 5 problems</button></div>
   </div>`;
 }
-function duelCardJudge(d){
-  const ungraded=d.loadout.filter(x=>!x.graded).length;
+function duelCardJudge(d,me){
+  const lo=myOwnLoadout(d,me);
+  const ungraded=lo.filter(x=>!x.graded).length;
+  const answerer=me===d.challenger?d.opponent:d.challenger;
   return `<div class="card anim-in">
-    <div class="badge ora" style="margin-bottom:10px"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-flag"/></svg> Your turn to judge (${ungraded} left)</div>
+    <div class="badge ora" style="margin-bottom:10px"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-flag"/></svg> Your turn to judge ${dispName(answerer)} (${ungraded} left)</div>
     ${duelGridHtml(d)}
     <div style="text-align:center;font-size:13px;color:var(--text2);margin-bottom:12px">Stakes: <strong style="color:var(--text)">✦ ${d.stakes} reputation</strong></div>
     <div style="text-align:center"><button class="btn" onclick="openDuelJudgeModal('${d._id}')">Review answers</button></div>
@@ -1991,14 +2065,21 @@ function duelCardWaiting(d,label){
     <div style="text-align:center;font-size:13px;color:var(--text2)">Stakes: <strong style="color:var(--text)">✦ ${d.stakes} reputation</strong></div>
   </div>`;
 }
-function duelCardCompleted(d){
-  const won=d.winner===currentUser.username;
-  const opp=d.challenger===currentUser.username?d.opponent:d.challenger;
-  return `<div class="card anim-in" style="border-color:${won?'var(--grn-bd)':'var(--red-bd)'}">
+function duelCardCompleted(d,me){
+  const won=d.winner===me;
+  const draw=!d.winner;
+  const opp=d.challenger===me?d.opponent:d.challenger;
+  const myScore=(me===d.challenger?d.challengerScore:d.opponentScore)||0;
+  const theirScore=(me===d.challenger?d.opponentScore:d.challengerScore)||0;
+  const badgeCls=draw?'':(won?'grn':'red');
+  const badgeIcon=draw?'ic-flag':(won?'ic-check':'ic-x');
+  const badgeLabel=draw?'Draw':(won?'Victory':'Defeat');
+  return `<div class="card anim-in" style="border-color:${draw?'var(--border)':won?'var(--grn-bd)':'var(--red-bd)'}">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
-      <div class="badge ${won?'grn':'red'}"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#${won?'ic-check':'ic-x'}"/></svg> ${won?'Victory':'Defeat'}</div>
+      <div class="badge ${badgeCls}"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#${badgeIcon}"/></svg> ${badgeLabel}</div>
+      <span class="meta">Score: ${myScore}-${theirScore}</span>
     </div>
-    <div style="font-size:14px;color:var(--text2)">vs <strong>${dispName(opp)}</strong> — <span style="color:${won?'var(--grn-t)':'var(--red-t)'};font-weight:600">${won?'+':'-'}✦ ${d.stakes} reputation</span></div>
+    <div style="font-size:14px;color:var(--text2)">vs <strong>${dispName(opp)}</strong>${draw?'':` — <span style="color:${won?'var(--grn-t)':'var(--red-t)'};font-weight:600">${won?'+':'-'}✦ ${d.stakes} reputation</span>`}</div>
   </div>`;
 }
 async function respondDuel(id,action){
@@ -2008,33 +2089,75 @@ async function respondDuel(id,action){
     renderDuelsPanel();
   }catch(e){ alert(e.message); }
 }
+function showDuelHistorySummary(){
+  if(!currentUser){alert('Sign in to see your duel history.');return;}
+  const me=currentUser.username;
+  const completed=MY_DUELS.filter(d=>d.status==='completed');
+  const wins=completed.filter(d=>d.winner===me).length;
+  const losses=completed.filter(d=>d.winner&&d.winner!==me).length;
+  const draws=completed.filter(d=>!d.winner).length;
+  alert(`W: ${wins} · L: ${losses} · D: ${draws}\n\n${completed.length===0?'You have not completed any duels yet.':`Out of ${completed.length} completed duel${completed.length!==1?'s':''}.`}`);
+}
+function showPendingInvitesSummary(){
+  if(!currentUser){alert('Sign in to see pending invites.');return;}
+  const incoming=MY_DUELS.filter(d=>d.opponent===currentUser.username&&d.status==='pending');
+  if(incoming.length===0){alert('No incoming challenges right now.');return;}
+  alert(incoming.map(d=>`${dispName(d.challenger)} — ✦${d.stakes} stakes`).join('\n'));
+}
+function updateDuelSummaryDescs(){
+  const hd=document.getElementById('duel-history-desc');
+  const pd=document.getElementById('pending-invites-desc');
+  if(!currentUser){ if(hd)hd.textContent='W: 0 · L: 0 · D: 0'; if(pd)pd.textContent='No incoming challenges'; return; }
+  const me=currentUser.username;
+  const completed=MY_DUELS.filter(d=>d.status==='completed');
+  const wins=completed.filter(d=>d.winner===me).length;
+  const losses=completed.filter(d=>d.winner&&d.winner!==me).length;
+  const draws=completed.filter(d=>!d.winner).length;
+  if(hd)hd.textContent=`W: ${wins} · L: ${losses} · D: ${draws}`;
+  const incoming=MY_DUELS.filter(d=>d.opponent===me&&d.status==='pending').length;
+  if(pd)pd.textContent=incoming>0?`${incoming} incoming challenge${incoming!==1?'s':''}`:'No incoming challenges';
+}
 
-// DUEL ANSWER MODAL
+// DUEL ANSWER MODAL — always shows the OTHER person's loadout (the problems I must answer)
 let answeringDuelId=null;
 function openDuelAnswerModal(id){
   const d=MY_DUELS.find(x=>x._id===id);if(!d)return;
+  const me=currentUser.username;
   answeringDuelId=id;
-  document.getElementById('duel-answer-stakes').textContent=`vs ${dispName(d.challenger)} · Stakes: ✦ ${d.stakes} reputation`;
+  const lo=otherLoadout(d,me);
+  const author=me===d.challenger?d.opponent:d.challenger;
+  document.getElementById('duel-answer-stakes').textContent=`vs ${dispName(author)} · Stakes: ✦ ${d.stakes} reputation`;
   const el=document.getElementById('duel-answer-list');
-  el.innerHTML=d.loadout.map((item,i)=>{
+  el.innerHTML=lo.map((item,i)=>{
     const checkable=item.type==='set'&&item.referenceAnswer;
-    return `<div class="card" style="margin-bottom:10px"><div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:6px">PROBLEM ${i+1} ${item.type==='set'?'(from their solved sets)':item.type==='forum'?'(forum problem)':'(original problem)'}</div><div class="latex-box" style="margin:0 0 8px">${item.statement}</div>${checkable?`<input class="inp" id="duel-ans-${i}" placeholder="Your answer">`:`<textarea class="inp" id="duel-ans-${i}" placeholder="Your solution..." style="min-height:70px"></textarea>`}</div>`;
+    return `<div class="card" style="margin-bottom:10px"><div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:6px">PROBLEM ${i+1}</div><div class="latex-box" style="margin:0 0 8px">${item.statement}</div>${checkable?`<input class="inp" id="duel-ans-${i}" placeholder="Your answer">`:`<textarea class="inp" id="duel-ans-${i}" placeholder="Your solution..." style="min-height:70px"></textarea>`}</div>`;
   }).join('');
   document.getElementById('duel-answer-modal').classList.add('open');
   setTimeout(()=>rl(el),80);
 }
 async function submitDuelAnswers(){
   const d=MY_DUELS.find(x=>x._id===answeringDuelId);if(!d)return;
-  const answers=d.loadout.map((item,i)=>({slot:i,text:document.getElementById('duel-ans-'+i).value.trim()}));
+  const me=currentUser.username;
+  const lo=otherLoadout(d,me);
+  const answers=lo.map((item,i)=>({slot:i,text:document.getElementById('duel-ans-'+i).value.trim()}));
   if(answers.some(a=>!a.text)){if(!confirm('Some answers are blank — submit anyway?'))return;}
   try{
     const {duel}=await api(`/duels/${answeringDuelId}/answers`,{method:'POST',body:JSON.stringify({answers})});
     const i=MY_DUELS.findIndex(x=>x._id===answeringDuelId);if(i>=0)MY_DUELS[i]=duel;
     closeModal('duel-answer-modal');renderDuelsPanel();
+    if(duel.status==='completed'){await refreshUser();showDuelResultAlert(duel,me);}
   }catch(e){ alert(e.message); }
 }
+function showDuelResultAlert(duel,me){
+  const won=duel.winner===me;
+  const draw=!duel.winner;
+  const myScore=me===duel.challenger?duel.challengerScore:duel.opponentScore;
+  const theirScore=me===duel.challenger?duel.opponentScore:duel.challengerScore;
+  alert(draw?`Draw! Final score ${myScore}-${theirScore}. No reputation changed.`:`${won?'You won':'You lost'} ✦${duel.stakes} reputation! Final score ${myScore}-${theirScore}.`);
+}
 
-// DUEL JUDGE MODAL
+// DUEL JUDGE MODAL — always shows MY OWN loadout (the problems I authored, that
+// the other person answered) — that's what I'm qualified to grade.
 let judgingDuelId=null;
 function openDuelJudgeModal(id){
   const d=MY_DUELS.find(x=>x._id===id);if(!d)return;
@@ -2043,17 +2166,20 @@ function openDuelJudgeModal(id){
   document.getElementById('duel-judge-modal').classList.add('open');
 }
 function renderJudgeModalContent(d){
+  const me=currentUser.username;
+  const lo=myOwnLoadout(d,me);
+  const answerer=me===d.challenger?d.opponent:d.challenger;
   const el=document.getElementById('duel-judge-list');
-  const ungraded=d.loadout.map((item,i)=>({item,i})).filter(x=>!x.item.graded);
+  const ungraded=lo.map((item,i)=>({item,i})).filter(x=>!x.item.graded);
   if(ungraded.length===0){
-    el.innerHTML=`<div class="card" style="text-align:center;color:var(--grn-t);padding:20px">All graded — duel complete!</div>`;
+    el.innerHTML=`<div class="card" style="text-align:center;color:var(--grn-t);padding:20px">All graded!</div>`;
     return;
   }
   el.innerHTML=ungraded.map(({item,i})=>`<div class="card" style="margin-bottom:10px">
-    <div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:6px">PROBLEM ${i+1}</div>
+    <div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:6px">PROBLEM ${i+1} (yours)</div>
     <div class="latex-box" style="margin:0 0 8px">${item.statement}</div>
-    <div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:4px">${dispName(MY_DUELS.find(x=>x._id===judgingDuelId).opponent)}'s answer:</div>
-    <div class="latex-box" style="margin:0 0 8px;background:var(--blu-bg);border-color:var(--blu-bd)">${item.opponentAnswer||'(blank)'}</div>
+    <div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:4px">${dispName(answerer)}'s answer:</div>
+    <div class="latex-box" style="margin:0 0 8px;background:var(--blu-bg);border-color:var(--blu-bd)">${item.answer||'(blank)'}</div>
     <div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:4px">Reference (your own solution):</div>
     <div class="latex-box" style="margin:0 0 10px;background:var(--grn-bg);border-color:var(--grn-bd)">${item.referenceAnswer}</div>
     <div style="display:flex;gap:8px"><button class="btn" style="background:var(--grn-t);border-color:var(--grn-t)" onclick="judgeSlot(${i},true)">Correct</button><button class="btn" style="background:var(--red-t);border-color:var(--red-t)" onclick="judgeSlot(${i},false)">Incorrect</button></div>
@@ -2066,12 +2192,111 @@ async function judgeSlot(slot,correct){
     const i=MY_DUELS.findIndex(x=>x._id===judgingDuelId);if(i>=0)MY_DUELS[i]=duel;
     if(duel.status==='completed'){
       closeModal('duel-judge-modal');renderDuelsPanel();await refreshUser();
-      const won=duel.winner===currentUser.username;
-      alert(`Duel complete! ${won?'You won':'You lost'} ✦ ${duel.stakes} reputation.`);
+      showDuelResultAlert(duel,currentUser.username);
     } else {
       renderJudgeModalContent(duel);renderDuelsPanel();
     }
   }catch(e){ alert(e.message); }
+}
+
+// ============================================================================
+// NOTIFICATIONS — polled periodically. New duel-related notifications trigger
+// an owl flying past with a delivered scroll when the Owl theme is active.
+// ============================================================================
+let NOTIFICATIONS=[];
+let knownNotifIds=new Set();
+let notifPollTimer=null;
+let notifFirstLoad=true;
+
+function startNotifPolling(){
+  stopNotifPolling();
+  pollNotifications();
+  notifPollTimer=setInterval(pollNotifications,20000);
+}
+function stopNotifPolling(){
+  if(notifPollTimer){clearInterval(notifPollTimer);notifPollTimer=null;}
+  NOTIFICATIONS=[];knownNotifIds=new Set();notifFirstLoad=true;
+  const badge=document.getElementById('notif-badge');if(badge)badge.style.display='none';
+}
+async function pollNotifications(){
+  if(!currentUser)return;
+  try{
+    const {notifications}=await api('/notifications');
+    const incomingIds=new Set(notifications.map(n=>n._id));
+    const newOnes=notifFirstLoad?[]:notifications.filter(n=>!knownNotifIds.has(n._id));
+    NOTIFICATIONS=notifications;
+    knownNotifIds=incomingIds;
+    notifFirstLoad=false;
+
+    const unread=NOTIFICATIONS.filter(n=>!n.read).length;
+    const badge=document.getElementById('notif-badge');
+    if(badge){
+      if(unread>0){badge.style.display='flex';badge.textContent=unread>9?'9+':unread;}
+      else badge.style.display='none';
+    }
+    const dd=document.getElementById('notif-dropdown');
+    if(dd&&dd.classList.contains('open'))renderNotifDropdown();
+
+    if(newOnes.length>0){
+      if(theme==='owl')playDelivery();
+      try{
+        const {duels}=await api('/duels');
+        MY_DUELS=duels;
+        const ddPanel=document.getElementById('panel-dd');
+        if(ddPanel&&ddPanel.style.display!=='none')renderDuelsPanel();
+      }catch(e){}
+    }
+  }catch(e){ /* notifications are a nice-to-have — fail silently */ }
+}
+function toggleNotifDropdown(){
+  const dd=document.getElementById('notif-dropdown');
+  const was=dd.classList.contains('open');
+  closeDD();
+  if(!was){dd.classList.add('open');renderNotifDropdown();}
+}
+function renderNotifDropdown(){
+  const dd=document.getElementById('notif-dropdown');
+  if(NOTIFICATIONS.length===0){
+    dd.innerHTML=`<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">No notifications yet.</div>`;
+    return;
+  }
+  const unreadCount=NOTIFICATIONS.filter(n=>!n.read).length;
+  let html=`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border)"><span style="font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.5px">Notifications</span>${unreadCount>0?`<button style="font-size:11px;color:var(--accent);background:none;border:none;cursor:pointer;text-decoration:underline" onclick="markAllNotifsRead()">Mark all read</button>`:''}</div>`;
+  html+=NOTIFICATIONS.map(n=>`<div class="ddi" style="cursor:pointer;${n.read?'':'background:var(--blu-bg)'}" onclick='openNotifAndNavigate(${JSON.stringify(n._id)})'>
+    <div class="ddi-ic" style="flex-shrink:0"><svg class="ic ic-sm" style="stroke:currentColor"><use href="#ic-bell"/></svg></div>
+    <div style="min-width:0"><div style="font-size:12.5px;color:var(--text);line-height:1.4;${n.read?'':'font-weight:600'}">${n.message}</div><div style="font-size:10.5px;color:var(--text3);margin-top:3px">${timeAgo(n.createdAt)}</div></div>
+  </div>`).join('');
+  dd.innerHTML=html;
+}
+function timeAgo(dateStr){
+  const diffMs=Date.now()-new Date(dateStr).getTime();
+  const mins=Math.floor(diffMs/60000);
+  if(mins<1)return 'just now';
+  if(mins<60)return mins+'m ago';
+  const hrs=Math.floor(mins/60);
+  if(hrs<24)return hrs+'h ago';
+  return Math.floor(hrs/24)+'d ago';
+}
+async function markNotifRead(id){
+  try{ await api(`/notifications/${id}/read`,{method:'POST'}); const n=NOTIFICATIONS.find(x=>x._id===id);if(n)n.read=true; }catch(e){}
+}
+async function markAllNotifsRead(){
+  try{
+    await api('/notifications/read-all',{method:'POST'});
+    NOTIFICATIONS.forEach(n=>n.read=true);
+    renderNotifDropdown();
+    const badge=document.getElementById('notif-badge');if(badge)badge.style.display='none';
+  }catch(e){}
+}
+async function openNotifAndNavigate(id){
+  await markNotifRead(id);
+  renderNotifDropdown();
+  const unread=NOTIFICATIONS.filter(n=>!n.read).length;
+  const badge=document.getElementById('notif-badge');
+  if(badge){if(unread>0){badge.style.display='flex';badge.textContent=unread>9?'9+':unread;}else badge.style.display='none';}
+  closeDD();
+  showPage('arena');
+  switchInner('dd',document.querySelectorAll('#page-arena .inner-tabs .itab')[1]);
 }
 
 // ============================================================================
